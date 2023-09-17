@@ -1,4 +1,4 @@
-![alt text](https://github.com/fabriceci/godot-rapier2d/blob/master/cover.png?raw=true)
+![Rapier2D Extension for Godot](https://github.com/fabriceci/godot-rapier2d/blob/main/logo.jpg?raw=true)
 
 ## Compatibility
 
