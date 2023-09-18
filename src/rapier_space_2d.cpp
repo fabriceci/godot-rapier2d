@@ -557,7 +557,8 @@ Variant RapierSpace2D::get_default_area_param(PhysicsServer2D::AreaParameter p_p
 			return default_linear_damping;
 		case PhysicsServer2D::AREA_PARAM_ANGULAR_DAMP:
 			return default_angular_damping;
-		default: break;
+		default:
+			break;
 	}
 
 	ERR_FAIL_V_MSG(Variant(), "Unsupported space default area param " + itos(p_param));
