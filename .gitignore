@@ -10,6 +10,7 @@ bin/godot-rapier2d/bin/*
 *.dblite
 *.pdb
 
+
 # System/tool-specific ignores
 .directory
 .DS_Store
