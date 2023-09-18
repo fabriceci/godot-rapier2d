@@ -27,7 +27,6 @@ jobs:
         with:
           sconsflags: ${{ env.SCONSFLAGS }}
           arch: ${{ matrix.arch }}
-          rust_target: aarch64-apple-darwin
           platform: macos
           target: ${{ matrix.target }}
       

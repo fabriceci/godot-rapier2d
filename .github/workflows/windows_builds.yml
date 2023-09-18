@@ -29,7 +29,6 @@ jobs:
           sconsflags: ${{ env.SCONSFLAGS }}
           arch: ${{ matrix.arch }}
           platform: windows
-          rust_target: ${{ matrix.arch }}-pc-windows-msvc
           target: ${{ matrix.target }}
 
       - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
