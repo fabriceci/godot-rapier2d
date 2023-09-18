@@ -10,9 +10,12 @@ if env["dev_build"]:
 else:
     lib_folder = "src/rapier2d-wrapper/target/release"
 
-lib_file = "librapier2d_wrapper{}"
-
-lib = lib_file.format(env["LIBSUFFIX"])
+if env["platform"] == "windows":
+	lib_file = "rapier2d_wrapper{}"
+	lib = lib_file.format(env["LIBSUFFIX"])
+else:
+	lib_file = "librapier2d_wrapper{}"
+	lib = lib_file.format(env["LIBSUFFIX"])
 env.Append(LIBPATH=[lib_folder])
 env.Append(LIBS=[lib])
 
