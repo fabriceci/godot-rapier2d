@@ -44,6 +44,7 @@ Those scripts will automatically:
 - Compile a release version of the rust Rapier 2D library (in `src/rapier2d-wrapper/target/release/`)
 - Generate the C bindings header file (in `src/rapier2d-wrapper/includes/`)
 
+
 ### Compile the Rapier 2D extension
 
 This step will build the final Godot Rapier extension library.
