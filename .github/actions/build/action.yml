@@ -47,11 +47,11 @@ runs:
       shell: sh
       run: |
         cd src/rapier2d-wrapper && cargo build ${{ inputs.rust_target }} --release
-    - name: Build Rapier Universal
+    - name: Build Rapier Macos Universal
       shell: sh
       
       # we already built for x86_64-apple-darwin for mac, now build arm64
-      if: ${{ inputs.platform == 'universal'}}
+      if: ${{ inputs.platform == 'macos'}}
       run: |
         cd src/rapier2d-wrapper && mkdir release
         cd src/rapier2d-wrapper && cargo build --target=aarch64-apple-darwin --release && lipo -create -output target/release/librapier2d_wrapper.a target/aarch64-apple-darwin/release/librapier2d_wrapper.a target/x86_64-apple-darwin/release/librapier2d_wrapper.a
