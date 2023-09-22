@@ -827,17 +827,21 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery
 
 	// Step 1: recover motion.
+	// Expand the body colliders by the margin (grow) and check if now it collides with a collider,
+	// if yes, "recover" / "push" out of this collider
 	Vector2 recover_motion;
 	Rect2 body_aabb = p_body->get_aabb();
 	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, body_aabb);
 
 	// Step 2: Cast motion.
+	// Try to to find what is the possible motion (how far it can move, it's a shapecast, when you try to find the safe point (max you can move without collision ))
 	real_t best_safe = 1.0;
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
 	RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
 
 	// Step 3: Rest Info
+	// Apply the motion and fill the collision information
 	bool collided = false;
 	if ((p_recovery_as_collision && recovered) || (best_safe < 1.0)) {
 		if (best_safe >= 1.0) {
@@ -858,6 +862,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 			r_result->remainder = p_motion - p_motion * best_safe;
 			r_result->collision_safe_fraction = best_safe;
 			r_result->collision_unsafe_fraction = best_unsafe;
+			ERR_PRINT("travel "+ rtos(r_result->travel.x) + " " + rtos(r_result->travel.y));
 		} else {
 			r_result->travel = recover_motion + p_motion;
 			r_result->remainder = Vector2();
