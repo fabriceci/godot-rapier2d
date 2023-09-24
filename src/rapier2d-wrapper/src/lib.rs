@@ -2,6 +2,7 @@ use rapier2d::crossbeam;
 use rapier2d::data::Arena;
 use rapier2d::data::Index;
 use rapier2d::parry;
+use rapier2d::parry::query::ClosestPoints;
 use rapier2d::prelude::*;
 
 // Handle
@@ -1102,6 +1103,21 @@ pub extern "C" fn body_create_dynamic(world_handle : Handle, pos : &Vector, rot 
 }
 
 #[no_mangle]
+pub extern "C" fn body_create_kinematic(world_handle : Handle, pos : &Vector, rot : f32, user_data : &UserData) -> Handle {
+    let mut physics_engine = SINGLETON.lock().unwrap();
+	let physics_world = physics_engine.get_world(world_handle);
+    let mut rigid_body = RigidBodyBuilder::kinematic_velocity_based().can_sleep(true).sleeping(true).build();
+	let activation = rigid_body.activation_mut();
+	// TODO: set parameter in Rapier once added, not possible for now
+	//activation.time_since_can_sleep = physics_world.sleep_time_until_sleep;
+    activation.linear_threshold = physics_world.sleep_linear_threshold;
+    activation.angular_threshold = physics_world.sleep_angular_threshold;
+    set_rigid_body_properties_internal(&mut rigid_body, pos, rot);
+	rigid_body.user_data = user_data.get_data();
+    return physics_world.insert_rigid_body(rigid_body);
+}
+
+#[no_mangle]
 pub extern "C" fn body_destroy(world_handle : Handle, body_handle : Handle) {
     let mut physics_engine = SINGLETON.lock().unwrap();
 	let physics_world = physics_engine.get_world(world_handle);
@@ -1714,7 +1730,7 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
 
 	let physics_world = physics_engine.get_world(world_handle);
 
-    let prediction = f32::max(physics_world.solver_prediction_distance, margin);
+    let prediction = f32::max(physics_world.solver_prediction_distance, 0.0);
 
     let shared_shape1 = physics_engine.get_shape(shape_handle1).clone();
     let shared_shape2 = physics_engine.get_shape(shape_handle2).clone();
@@ -1724,16 +1740,43 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     
     let mut result = ContactResult::new();
     
-    if let Ok(Some(contact)) = parry::query::contact(
-        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
+    if let Ok(closest_points) = parry::query::closest_points(
+        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), margin
     ) {
-        result.collided = true;
-        result.distance = contact.dist;
-        result.point1 = Vector{ x: contact.point1.x, y: contact.point1.y };
-        result.point2 = Vector{ x: contact.point2.x, y: contact.point2.y };
-        result.normal1 = Vector{ x: contact.normal1.x, y: contact.normal1.y };
-        result.normal2 = Vector{ x: contact.normal2.x, y: contact.normal2.y };
-        return result;
+        if closest_points == ClosestPoints::Intersecting {
+            if let Ok(Some(contact)) = parry::query::contact(
+                &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
+            ) {
+                result.collided = true;
+                result.distance = contact.dist + margin * 1.0;
+                // since we use margin, move point 1 by magin amount
+                let point_1_with_margin = contact.point1 + contact.normal1.scale(margin * 0.5);
+                let point_2_with_margin = contact.point2 + contact.normal2.scale(margin * 0.5);
+                
+                result.point1 = Vector{ x: point_1_with_margin.x, y: point_1_with_margin.y };
+                result.point2 = Vector{ x: point_2_with_margin.x, y: point_2_with_margin.y };
+                result.normal1 = Vector{ x: contact.normal1.x, y: contact.normal1.y };
+                result.normal2 = Vector{ x: contact.normal2.x, y: contact.normal2.y };
+                return result;
+            }
+        }
+        if closest_points != ClosestPoints::Disjoint {
+            if let ClosestPoints::WithinMargin(p1, p2) = closest_points {
+                let difference = p2 - p1;
+                let distance = difference.magnitude();
+                let normal = difference.normalize();
+                // since we use margin, move point 1 by magin amount
+                let point_1_with_margin = p1 + normal.scale(margin * 0.5);
+                let point_2_with_margin = p2 + -normal.scale(margin * 0.5);
+                result.collided = true;
+                result.distance = distance + margin;
+                result.point1 = Vector{ x: point_1_with_margin.x, y: point_1_with_margin.y};
+                result.point2 = Vector{ x: point_2_with_margin.x, y: point_2_with_margin.y };
+                result.normal1 = Vector{ x: normal.x, y: normal.y };
+                result.normal2 = Vector{ x: -normal.x, y: -normal.y };
+                return result;
+            }
+        }
     }
     return result;
 }
