@@ -139,7 +139,7 @@ void RapierBodyUtils2D::cast_motion(
 
 	rapier2d::PointHitInfo results[32];
 	int result_count = p_space.rapier_intersect_aabb(motion_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
-
+	ERR_PRINT("result count aabb "+ rtos(result_count));
 	if (result_count == 0) {
 		return;
 	}

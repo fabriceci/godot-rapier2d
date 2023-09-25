@@ -839,7 +839,10 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
 	if (!p_motion.is_zero_approx()) {
+		ERR_PRINT("transform " + rtos(body_transform.get_origin().x) + " " + rtos(body_transform.get_origin().y));
 		RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
+		
+		ERR_PRINT("best_safe "+ rtos(best_safe) + " " + rtos(best_unsafe));
 	}
 
 	// Step 3: Rest Info
@@ -856,6 +859,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		body_aabb.position += unsafe_motion;
 
 		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, body_aabb, best_body_shape, p_margin, r_result);
+
 	}
 
 	if (r_result) {
@@ -864,7 +868,6 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 			r_result->remainder = p_motion - p_motion * best_safe;
 			r_result->collision_safe_fraction = best_safe;
 			r_result->collision_unsafe_fraction = best_unsafe;
-			ERR_PRINT("travel "+ rtos(r_result->travel.x) + " " + rtos(r_result->travel.y));
 		} else {
 			r_result->travel = recover_motion + p_motion;
 			r_result->remainder = Vector2();
