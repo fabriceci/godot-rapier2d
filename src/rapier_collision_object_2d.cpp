@@ -290,10 +290,8 @@ void RapierCollisionObject2D::_set_space(RapierSpace2D *p_space) {
 
 		if (mode == PhysicsServer2D::BODY_MODE_STATIC) {
 			body_handle = rapier2d::body_create_fixed(space_handle, &position, angle, &user_data);
-		} else if (mode == PhysicsServer2D::BODY_MODE_RIGID || mode == PhysicsServer2D::BODY_MODE_RIGID_LINEAR){
+		} else {
 			body_handle = rapier2d::body_create_dynamic(space_handle, &position, angle, &user_data);
-		} else if (mode == PhysicsServer2D::BODY_MODE_KINEMATIC){
-			body_handle = rapier2d::body_create_kinematic(space_handle, &position, angle, &user_data);
 		}
 
 		for (uint32_t i = 0; i < shapes.size(); i++) {

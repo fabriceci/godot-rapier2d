@@ -1,3 +1,4 @@
+use rapier2d::control::KinematicCharacterController;
 use rapier2d::crossbeam;
 use rapier2d::data::Arena;
 use rapier2d::data::Index;
@@ -1092,21 +1093,6 @@ pub extern "C" fn body_create_dynamic(world_handle : Handle, pos : &Vector, rot 
     let mut physics_engine = SINGLETON.lock().unwrap();
 	let physics_world = physics_engine.get_world(world_handle);
     let mut rigid_body = RigidBodyBuilder::dynamic().can_sleep(true).sleeping(true).build();
-	let activation = rigid_body.activation_mut();
-	// TODO: set parameter in Rapier once added, not possible for now
-	//activation.time_since_can_sleep = physics_world.sleep_time_until_sleep;
-    activation.linear_threshold = physics_world.sleep_linear_threshold;
-    activation.angular_threshold = physics_world.sleep_angular_threshold;
-    set_rigid_body_properties_internal(&mut rigid_body, pos, rot);
-	rigid_body.user_data = user_data.get_data();
-    return physics_world.insert_rigid_body(rigid_body);
-}
-
-#[no_mangle]
-pub extern "C" fn body_create_kinematic(world_handle : Handle, pos : &Vector, rot : f32, user_data : &UserData) -> Handle {
-    let mut physics_engine = SINGLETON.lock().unwrap();
-	let physics_world = physics_engine.get_world(world_handle);
-    let mut rigid_body = RigidBodyBuilder::kinematic_velocity_based().can_sleep(true).sleeping(true).build();
 	let activation = rigid_body.activation_mut();
 	// TODO: set parameter in Rapier once added, not possible for now
 	//activation.time_since_can_sleep = physics_world.sleep_time_until_sleep;

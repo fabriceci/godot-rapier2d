@@ -164,11 +164,6 @@ Handle body_create_fixed(Handle world_handle,
                          float rot,
                          const UserData *user_data);
 
-Handle body_create_kinematic(Handle world_handle,
-                             const Vector *pos,
-                             float rot,
-                             const UserData *user_data);
-
 void body_destroy(Handle world_handle, Handle body_handle);
 
 void body_force_sleep(Handle world_handle, Handle body_handle);
