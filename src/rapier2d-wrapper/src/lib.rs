@@ -1717,7 +1717,7 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
 	let physics_world = physics_engine.get_world(world_handle);
 
     let prediction = f32::max(physics_world.solver_prediction_distance, 0.0);
-
+    
     let shared_shape1 = physics_engine.get_shape(shape_handle1).clone();
     let shared_shape2 = physics_engine.get_shape(shape_handle2).clone();
 
@@ -1746,7 +1746,7 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
                 return result;
             }
         }
-        if closest_points != ClosestPoints::Disjoint {
+        else if closest_points != ClosestPoints::Disjoint {
             if let ClosestPoints::WithinMargin(p1, p2) = closest_points {
                 let difference = p2 - p1;
                 let distance = difference.magnitude();

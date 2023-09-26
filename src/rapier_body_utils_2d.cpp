@@ -3,7 +3,6 @@
 #include "rapier_shape_2d.h"
 #include "rapier_space_2d.h"
 
-#define TEST_MOTION_MARGIN_MIN_VALUE 0.0001
 #define TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR 0.05
 
 bool RapierBodyUtils2D::body_motion_recover(
@@ -15,6 +14,8 @@ bool RapierBodyUtils2D::body_motion_recover(
 		Rect2 &p_body_aabb) {
 	int shape_count = p_body.get_shape_count();
 	ERR_FAIL_COND_V(shape_count < 1, false);
+	real_t min_contact_depth = p_margin * TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR;
+	min_contact_depth = 0;
 
 	// Create compound shape for the body if needed
 	/*rapier2d::Handle body_shape_handle;
@@ -38,19 +39,14 @@ bool RapierBodyUtils2D::body_motion_recover(
 		body_shape_handle = p_body.get_shape(0)->get_rapier_shape();
 	}*/
 
-	real_t margin = MAX(p_margin, TEST_MOTION_MARGIN_MIN_VALUE);
-	real_t min_contact_depth = margin * TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR;
-
-	// Undo the currently transform the physics server is aware of and apply the provided one
-	p_body_aabb = p_transform.xform(p_body_aabb);
-	Rect2 margin_body_aabb = p_body_aabb.grow(margin);
-
 	bool recovered = false;
 	int recover_attempts = 4;
 	do {
 		rapier2d::PointHitInfo results[32];
-		int result_count = p_space.rapier_intersect_aabb(margin_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
-
+		ERR_PRINT("body_motion_recover " + rtos(p_margin));
+		ERR_PRINT("p_body_aabb " + rtos(p_body_aabb.position.x) + " " + rtos(p_body_aabb.position.y) + " " + rtos(p_body_aabb.get_size().x) + " " + rtos(p_body_aabb.get_size().y));
+		int result_count = p_space.rapier_intersect_aabb(p_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
+		ERR_PRINT(rtos(result_count));
 		// Optimization
 		if (result_count == 0) {
 			break;
@@ -72,10 +68,10 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 			for (int result_idx = 0; result_idx < result_count; ++result_idx) {
 				rapier2d::PointHitInfo &result = results[result_idx];
-
 				ERR_CONTINUE(!rapier2d::is_user_data_valid(result.user_data));
 				uint32_t shape_index = 0;
 				RapierCollisionObject2D *shape_col_object = RapierCollisionObject2D::get_collider_user_data(result.user_data, shape_index);
+				
 				ERR_CONTINUE(!shape_col_object);
 
 				ERR_CONTINUE(shape_col_object->get_type() != RapierCollisionObject2D::TYPE_BODY);
@@ -88,7 +84,8 @@ bool RapierBodyUtils2D::body_motion_recover(
 				rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 				real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
 
-				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, margin);
+				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
+				
 				if (!contact.collided) {
 					continue;
 				}
@@ -104,18 +101,16 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 				// Compute depth on recovered motion.
 				real_t depth = n.dot(a + recover_step) - d;
-				if (depth > min_contact_depth + CMP_EPSILON) {
+				if (depth > min_contact_depth) {
 					// Only recover if there is penetration.
 					recover_step -= n * (depth - min_contact_depth) * 0.4f;
 				}
 			}
 		}
-
 		if (recovered) {
 			p_recover_motion += recover_step;
 			p_transform.columns[2] += recover_step;
 			p_body_aabb.position += recover_step;
-			margin_body_aabb.position += recover_step;
 		} else {
 			break;
 		}
@@ -132,14 +127,20 @@ void RapierBodyUtils2D::cast_motion(
 		const Rect2 &p_body_aabb,
 		real_t &p_closest_safe,
 		real_t &p_closest_unsafe,
-		int &p_best_body_shape) {
+		int &p_best_body_shape,
+		real_t p_margin) {
 	Rect2 motion_aabb = p_body_aabb;
 	motion_aabb.position += p_motion;
 	motion_aabb = motion_aabb.merge(p_body_aabb);
 
 	rapier2d::PointHitInfo results[32];
+	ERR_PRINT("cast_motion " + rtos(p_margin));
+	ERR_PRINT("p_motion " + rtos(p_motion.x) + " " + rtos(p_motion.y));
+	ERR_PRINT("p_body_aabb " + rtos(p_body_aabb.position.x) + " " + rtos(p_body_aabb.position.y) + " " + rtos(p_body_aabb.get_size().x) + " " + rtos(p_body_aabb.get_size().y));
+	ERR_PRINT("motion_aabb " + rtos(motion_aabb.position.x) + " " + rtos(motion_aabb.position.y) + " " + rtos(motion_aabb.get_size().x) + " " + rtos(motion_aabb.get_size().y));
 	int result_count = p_space.rapier_intersect_aabb(motion_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
-	ERR_PRINT("result count aabb "+ rtos(result_count));
+	
+	ERR_PRINT(rtos(result_count));
 	if (result_count == 0) {
 		return;
 	}
@@ -211,7 +212,7 @@ void RapierBodyUtils2D::cast_motion(
 				real_t fraction = low + (hi - low) * fraction_coeff;
 
 				rapier2d::Vector rapier_body_shape_step_pos{ body_shape_pos.x + p_motion.x * fraction, body_shape_pos.y + p_motion.y * fraction };
-				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0);
+				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.0);
 
 				if (step_contact.collided) {
 					hi = fraction;
@@ -286,14 +287,10 @@ bool RapierBodyUtils2D::body_motion_collide(
 		body_shape_handle = p_body.get_shape(0)->get_rapier_shape();
 	}*/
 
-	real_t margin = MAX(p_margin, TEST_MOTION_MARGIN_MIN_VALUE);
-	real_t min_contact_depth = margin * TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR;
-
-	Rect2 margin_body_aabb = p_body_aabb.grow(margin);
-
 	rapier2d::PointHitInfo results[32];
-	int result_count = p_space.rapier_intersect_aabb(margin_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
-
+	int result_count = p_space.rapier_intersect_aabb(p_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
+	ERR_PRINT("motion collide");
+	ERR_PRINT(rtos(result_count));
 	// Optimization
 	if (result_count == 0) {
 		return false;
@@ -337,7 +334,7 @@ bool RapierBodyUtils2D::body_motion_collide(
 			rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 			real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
 
-			rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, margin);
+			rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
 			if (!contact.collided) {
 				continue;
 			}

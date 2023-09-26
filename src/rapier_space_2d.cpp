@@ -823,26 +823,31 @@ int RapierDirectSpaceState2D::_intersect_shape(const RID &shape_rid, const Trans
 	return cpt;
 }
 
+#define TEST_MOTION_MARGIN_MIN_VALUE 0.0001
+
 bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *r_result) const {
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery
-
+	ERR_PRINT("---START---");
 	// Step 1: recover motion.
 	// Expand the body colliders by the margin (grow) and check if now it collides with a collider,
 	// if yes, "recover" / "push" out of this collider
 	Vector2 recover_motion;
 	Rect2 body_aabb = p_body->get_aabb();
-	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, body_aabb);
+	// Undo the currently transform the physics server is aware of and apply the provided one
+	body_aabb = body_transform.xform(body_aabb);
 
+	real_t margin = MAX(p_margin, TEST_MOTION_MARGIN_MIN_VALUE);
+
+	body_aabb = body_aabb.grow(margin);
+
+	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, body_aabb);
 	// Step 2: Cast motion.
 	// Try to to find what is the possible motion (how far it can move, it's a shapecast, when you try to find the safe point (max you can move without collision ))
 	real_t best_safe = 1.0;
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
 	if (!p_motion.is_zero_approx()) {
-		ERR_PRINT("transform " + rtos(body_transform.get_origin().x) + " " + rtos(body_transform.get_origin().y));
-		RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
-		
-		ERR_PRINT("best_safe "+ rtos(best_safe) + " " + rtos(best_unsafe));
+		RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape, 0.0);
 	}
 
 	// Step 3: Rest Info
@@ -876,7 +881,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 			r_result->collision_unsafe_fraction = 1.0f;
 		}
 	}
-
+	ERR_PRINT("---END---");
 	return collided;
 }
 
@@ -930,7 +935,6 @@ int RapierSpace2D::rapier_intersect_aabb(Rect2 p_aabb, uint32_t p_collision_mask
 
 	rapier2d::Vector rect_begin{ p_aabb.position.x, p_aabb.position.y };
 	rapier2d::Vector rect_end{ p_aabb.get_end().x, p_aabb.get_end().y };
-
 	QueryCallbackScope queryCallback(p_collision_mask);
 	g_query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
 	g_query_exclude_size = 0;
