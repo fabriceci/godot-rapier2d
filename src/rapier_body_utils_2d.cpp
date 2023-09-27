@@ -85,7 +85,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 				real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
 
 				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
-				
+				ERR_PRINT("contact col " + rtos(contact.collided));
 				if (!contact.collided) {
 					continue;
 				}
@@ -97,10 +97,16 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 				// Compute plane on b towards a.
 				Vector2 n = (a - b).normalized();
+				ERR_PRINT("a " + rtos(contact.point1.x) + " " + rtos(contact.point1.y));
+				ERR_PRINT("b " + rtos(contact.point2.x) + " " + rtos(contact.point2.y));
+				ERR_PRINT("n " + rtos(contact.normal1.x) + " " + rtos(contact.normal1.y));
+				ERR_PRINT("n " + rtos(contact.normal2.x) + " " + rtos(contact.normal2.y));
 				real_t d = n.dot(b);
+				ERR_PRINT("d " + rtos(d));
 
 				// Compute depth on recovered motion.
 				real_t depth = n.dot(a + recover_step) - d;
+				ERR_PRINT("depth " + rtos(depth));
 				if (depth > min_contact_depth) {
 					// Only recover if there is penetration.
 					recover_step -= n * (depth - min_contact_depth) * 0.4f;
