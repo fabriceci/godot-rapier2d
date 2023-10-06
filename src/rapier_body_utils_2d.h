@@ -29,8 +29,7 @@ public:
 			const Rect2 &p_body_aabb,
 			real_t &p_closest_safe,
 			real_t &p_closest_unsafe,
-			int &p_best_body_shape,
-			real_t p_margin);
+			int &p_best_body_shape);
 
 	static bool body_motion_collide(
 			const RapierSpace2D &p_space,
