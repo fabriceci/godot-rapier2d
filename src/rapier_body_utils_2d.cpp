@@ -340,7 +340,7 @@ bool RapierBodyUtils2D::body_motion_collide(
 			Vector2 a(contact.point1.x, contact.point1.y);
 			Vector2 b(contact.point2.x, contact.point2.y);
 			//ERR_PRINT("step 3 transform " + rtos(rapier_body_shape_pos.x) + " " + rtos(rapier_body_shape_pos.y));
-			contact.distance = p_margin - contact.distance;
+			contact.distance += p_margin;
 			ERR_PRINT("step 3 dist " + rtos(contact.distance));
 			if (contact.distance > min_distance) {
 				ERR_PRINT("step 3 made it");
