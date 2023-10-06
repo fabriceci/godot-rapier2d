@@ -835,24 +835,26 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 	Rect2 body_aabb = p_body->get_aabb();
 	// Undo the currently transform the physics server is aware of and apply the provided one
 	body_aabb = body_transform.xform(body_aabb);
+	Rect2 margin_aabb = body_aabb;
 
 	real_t margin = MAX(p_margin, TEST_MOTION_MARGIN_MIN_VALUE);
 
-	body_aabb = body_aabb.grow(margin);
+	margin_aabb = body_aabb.grow(margin);
 
-	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, body_aabb);
+	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, margin_aabb);
 	// Step 2: Cast motion.
 	// Try to to find what is the possible motion (how far it can move, it's a shapecast, when you try to find the safe point (max you can move without collision ))
 	real_t best_safe = 1.0;
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
-	if (!p_motion.is_zero_approx()) {
+	//if (!p_motion.is_zero_approx()) {
 		RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
-	}
+	//}
 
 	// Step 3: Rest Info
 	// Apply the motion and fill the collision information
 	bool collided = false;
+	ERR_PRINT("pre_step_3 " + rtos(p_recovery_as_collision) + " " + rtos(recovered) + " " + rtos(best_safe));
 	if ((p_recovery_as_collision && recovered) || (best_safe < 1.0)) {
 		if (best_safe >= 1.0) {
 			best_body_shape = -1; //no best shape with cast, reset to -1
@@ -862,8 +864,9 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		Vector2 unsafe_motion = p_motion * best_unsafe;
 		body_transform.columns[2] += unsafe_motion;
 		body_aabb.position += unsafe_motion;
+		margin_aabb.position = body_aabb.position;
 
-		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, body_aabb, best_body_shape, p_margin, r_result);
+		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, margin_aabb, best_body_shape, p_margin, r_result);
 	}
 	
 	if (r_result) {
@@ -875,11 +878,17 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		} else {
 			r_result->travel = recover_motion + p_motion;
 			r_result->remainder = Vector2();
-			r_result->collision_depth = 0.0f;
+			//r_result->collision_depth = 0.0f;
 			r_result->collision_safe_fraction = 1.0f;
 			r_result->collision_unsafe_fraction = 1.0f;
 		}
 	}
+	ERR_PRINT("end travel " + rtos(r_result->travel.x) + " " + rtos(r_result->travel.y));
+	ERR_PRINT("end remainder " + rtos(r_result->remainder.x) + " " + rtos(r_result->remainder.y));
+	ERR_PRINT("end depth " + rtos(r_result->collision_depth));
+	ERR_PRINT("end safe " + rtos(r_result->collision_safe_fraction));
+	ERR_PRINT("end unsafe " + rtos(r_result->collision_unsafe_fraction));
+	ERR_PRINT("end collided " + rtos(collided));
 	return collided;
 }
 
