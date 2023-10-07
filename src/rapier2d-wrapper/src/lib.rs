@@ -1715,8 +1715,6 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     let mut physics_engine = SINGLETON.lock().unwrap();
 
 	let physics_world = physics_engine.get_world(world_handle);
-
-    let prediction = f32::max(physics_world.solver_prediction_distance, margin);
     
     let shared_shape1 = physics_engine.get_shape(shape_handle1).clone();
     let shared_shape2 = physics_engine.get_shape(shape_handle2).clone();
@@ -1766,7 +1764,7 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     }
     */
     if let Ok(Some(contact)) = parry::query::contact(
-        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
+        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), margin
     ) {
         result.distance = contact.dist;
         result.collided = true;
