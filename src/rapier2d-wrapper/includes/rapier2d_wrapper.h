@@ -333,8 +333,7 @@ Handle shape_create_halfspace(const Vector *normal);
 
 void shape_destroy(Handle shape_handle);
 
-ContactResult shapes_contact(Handle world_handle,
-		Handle shape_handle1,
+ContactResult shapes_contact(Handle shape_handle1,
 		const Vector *position1,
 		float rotation1,
 		Handle shape_handle2,

@@ -1711,10 +1711,8 @@ pub extern "C" fn intersect_aabb(world_handle : Handle, aabb_min : &Vector, aabb
 }
 
 #[no_mangle]
-pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, position1: &Vector, rotation1: f32, shape_handle2 : Handle, position2: &Vector, rotation2: f32, margin: f32) -> ContactResult {
+pub extern "C" fn shapes_contact(shape_handle1 : Handle, position1: &Vector, rotation1: f32, shape_handle2 : Handle, position2: &Vector, rotation2: f32, margin: f32) -> ContactResult {
     let mut physics_engine = SINGLETON.lock().unwrap();
-
-	let physics_world = physics_engine.get_world(world_handle);
     
     let shared_shape1 = physics_engine.get_shape(shape_handle1).clone();
     let shared_shape2 = physics_engine.get_shape(shape_handle2).clone();
@@ -1723,46 +1721,6 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     let shape_transform2 = Isometry::new(vector![position2.x, position2.y], rotation2);
     
     let mut result = ContactResult::new();
-    /*
-    if let Ok(closest_points) = parry::query::closest_points(
-        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), margin
-    ) {
-        if closest_points == ClosestPoints::Intersecting {
-            if let Ok(Some(contact)) = parry::query::contact(
-                &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
-            ) {
-                result.collided = true;
-                result.distance = contact.dist + margin * 1.0;
-                // since we use margin, move point 1 by magin amount
-                let point_1_with_margin = contact.point1 + contact.normal1.scale(margin * 1.0);
-                let point_2_with_margin = contact.point2 + contact.normal2.scale(margin * 1.0);
-                
-                result.point1 = Vector{ x: point_1_with_margin.x, y: point_1_with_margin.y };
-                result.point2 = Vector{ x: point_2_with_margin.x, y: point_2_with_margin.y };
-                result.normal1 = Vector{ x: contact.normal1.x, y: contact.normal1.y };
-                result.normal2 = Vector{ x: contact.normal2.x, y: contact.normal2.y };
-                return result;
-            }
-        }
-        else if closest_points != ClosestPoints::Disjoint {
-            if let ClosestPoints::WithinMargin(p1, p2) = closest_points {
-                let difference = p2 - p1;
-                let distance = difference.magnitude();
-                let normal = difference.normalize();
-                // since we use margin, move point 1 by magin amount
-                let point_1_with_margin = p1 + normal.scale(margin * 1.0);
-                let point_2_with_margin = p2 + -normal.scale(margin * 1.0);
-                result.collided = true;
-                result.distance = distance + margin;
-                result.point1 = Vector{ x: point_1_with_margin.x, y: point_1_with_margin.y};
-                result.point2 = Vector{ x: point_2_with_margin.x, y: point_2_with_margin.y };
-                result.normal1 = Vector{ x: normal.x, y: normal.y };
-                result.normal2 = Vector{ x: -normal.x, y: -normal.y };
-                return result;
-            }
-        }
-    }
-    */
     if let Ok(Some(contact)) = parry::query::contact(
         &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), margin
     ) {
