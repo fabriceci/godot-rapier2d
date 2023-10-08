@@ -97,10 +97,9 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 				// Compute depth on recovered motion.
 				real_t depth = n.dot(a + recover_step) - d;
-				if (depth > min_contact_depth) {
+				if (depth > min_contact_depth + CMP_EPSILON) {
 					// Only recover if there is penetration.
 					recover_step -= n * (depth - min_contact_depth) * 0.4f;
-					//recover_step = -n * (depth);
 				}
 			}
 		}
