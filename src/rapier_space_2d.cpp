@@ -865,7 +865,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 
 		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, margin_aabb, best_body_shape, p_margin, r_result);
 	}
-	
+
 	if (r_result) {
 		if (collided) {
 			r_result->travel = recover_motion + p_motion * best_safe;
