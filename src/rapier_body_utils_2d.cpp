@@ -78,7 +78,6 @@ bool RapierBodyUtils2D::body_motion_recover(
 				Vector2 col_shape_pos = col_shape_transform.get_origin();
 				rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 				real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
-				//WARN_PRINT("step1pos " + rtos(rapier_body_shape_pos.x) + " " + rtos(rapier_body_shape_pos.y));
 				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
 				
 				if (!contact.collided) {
@@ -92,15 +91,12 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 				// Compute plane on b towards a.
 				Vector2 n = Vector2(contact.normal1.x, contact.normal1.y);
-				// Move a outside as to fit the margin
+				// Move it outside as to fit the margin
 				a += p_margin * n;
 				real_t d = n.dot(b);
 
 				// Compute depth on recovered motion.
 				real_t depth = n.dot(a + recover_step) - d;
-				//WARN_PRINT("step1depth " + rtos(contact.distance)); 
-				//WARN_PRINT("step1depth " + rtos(depth));
-				//depth = p_margin - contact.distance;
 				if (depth > min_contact_depth) {
 					// Only recover if there is penetration.
 					recover_step -= n * (depth - min_contact_depth) * 0.4f;
@@ -108,7 +104,6 @@ bool RapierBodyUtils2D::body_motion_recover(
 				}
 			}
 		}
-		//WARN_PRINT("step1 " + rtos(recover_step.x) + " " + rtos(recover_step.y) + " " + rtos(recover_step.length()));
 		if (recovered) {
 			p_recover_motion += recover_step;
 			p_transform.columns[2] += recover_step;
@@ -206,10 +201,6 @@ void RapierBodyUtils2D::cast_motion(
 				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.1);
 				if (!step_contact.collided || step_contact.distance >= 0) {
 					continue;
-					//p_closest_safe = 0;
-					//p_closest_unsafe = 0;
-					//p_best_body_shape = body_shape_idx; //sadly it's the best
-					//break;
 				}
 			}
 
@@ -257,7 +248,6 @@ void RapierBodyUtils2D::cast_motion(
 
 			if (low < best_safe) {
 				best_safe = low;
-				//WARN_PRINT("step2 " + rtos(best_safe));
 				best_unsafe = hi;
 			}
 		}
@@ -357,14 +347,8 @@ bool RapierBodyUtils2D::body_motion_collide(
 			}
 			Vector2 a(contact.point1.x, contact.point1.y);
 			Vector2 b(contact.point2.x, contact.point2.y);
-			//WARN_PRINT("step 3 transform " + rtos(rapier_body_shape_pos.x) + " " + rtos(rapier_body_shape_pos.y));
-			//WARN_PRINT("step 3 dist " + rtos(contact.distance));
-			//contact.distance += p_margin;
 			contact.distance = p_margin - contact.distance;
-			//WARN_PRINT("step 3 dist " + rtos(contact.distance));
-			ERR_PRINT("distance "+ rtos(contact.distance));
 			if (contact.distance > min_distance) {
-				//WARN_PRINT("step 3 made it");
 				min_distance = contact.distance;
 				best_collision_body = collision_body;
 				best_collision_shape_index = shape_index;
@@ -373,7 +357,6 @@ bool RapierBodyUtils2D::body_motion_collide(
 			}
 		}
 	}
-	ERR_PRINT("found best ");
 
 	if (best_collision_body) {
 		if (p_result) {
@@ -390,11 +373,9 @@ bool RapierBodyUtils2D::body_motion_collide(
 			Vector2 local_position = p_result->collision_point - best_collision_body->get_transform().get_origin();
 			p_result->collider_velocity = best_collision_body->get_velocity_at_local_point(local_position);
 		}
-		//ARN_PRINT("true");
 
 		return true;
 	}
-	//WARN_PRINT("false");
 
 	return false;
 }
