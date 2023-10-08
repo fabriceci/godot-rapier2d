@@ -1,9 +1,7 @@
-use rapier2d::control::KinematicCharacterController;
 use rapier2d::crossbeam;
 use rapier2d::data::Arena;
 use rapier2d::data::Index;
 use rapier2d::parry;
-use rapier2d::parry::query::ClosestPoints;
 use rapier2d::prelude::*;
 
 // Handle
