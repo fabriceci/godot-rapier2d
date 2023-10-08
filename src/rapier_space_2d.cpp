@@ -828,11 +828,9 @@ int RapierDirectSpaceState2D::_intersect_shape(const RID &shape_rid, const Trans
 bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *r_result) const {
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery
 	static int step = 0;
-	WARN_PRINT("count " + rtos(step++));
 	// Step 1: recover motion.
 	// Expand the body colliders by the margin (grow) and check if now it collides with a collider,
 	// if yes, "recover" / "push" out of this collider
-	//p_margin = p_margin * 2.0;
 	Vector2 recover_motion;
 	Rect2 body_aabb = p_body->get_aabb();
 	// Undo the currently transform the physics server is aware of and apply the provided one
@@ -849,15 +847,11 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 	real_t best_safe = 1.0;
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
-	//if (!p_motion.is_zero_approx()) {
-		RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
-	//}
-	WARN_PRINT("step2 " + rtos(best_safe) + " " + rtos(best_unsafe));
+	RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
 
 	// Step 3: Rest Info
 	// Apply the motion and fill the collision information
 	bool collided = false;
-	WARN_PRINT("pre_step_3 " + rtos(p_recovery_as_collision) + " " + rtos(recovered) + " " + rtos(best_safe));
 	if ((p_recovery_as_collision && recovered) || (best_safe < 1.0)) {
 		if (best_safe >= 1.0) {
 			best_body_shape = -1; //no best shape with cast, reset to -1
@@ -886,8 +880,6 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 			r_result->collision_unsafe_fraction = 1.0f;
 		}
 	}
-	WARN_PRINT("end travel " + rtos(r_result->travel.x) + " " + rtos(r_result->travel.y)+ " " + rtos(r_result->remainder.x) + " " + rtos(r_result->remainder.y) + " " + rtos(r_result->collision_depth));
-	WARN_PRINT("end safe " + rtos(r_result->collision_safe_fraction) + " " + rtos(r_result->collision_unsafe_fraction) + " " + rtos(collided));
 	return collided;
 }
 
