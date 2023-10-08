@@ -359,8 +359,10 @@ bool RapierBodyUtils2D::body_motion_collide(
 			Vector2 b(contact.point2.x, contact.point2.y);
 			//WARN_PRINT("step 3 transform " + rtos(rapier_body_shape_pos.x) + " " + rtos(rapier_body_shape_pos.y));
 			//WARN_PRINT("step 3 dist " + rtos(contact.distance));
-			contact.distance += p_margin;
+			//contact.distance += p_margin;
+			contact.distance = p_margin - contact.distance;
 			//WARN_PRINT("step 3 dist " + rtos(contact.distance));
+			ERR_PRINT("distance "+ rtos(contact.distance));
 			if (contact.distance > min_distance) {
 				//WARN_PRINT("step 3 made it");
 				min_distance = contact.distance;
@@ -371,6 +373,7 @@ bool RapierBodyUtils2D::body_motion_collide(
 			}
 		}
 	}
+	ERR_PRINT("found best ");
 
 	if (best_collision_body) {
 		if (p_result) {
