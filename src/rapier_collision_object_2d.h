@@ -57,13 +57,13 @@ protected:
 
 	void _update_transform();
 
+	void _set_static(bool p_static);
+
 	virtual void _init_material(rapier2d::Material &mat) const {}
 	virtual void _init_collider(rapier2d::Handle collider_handle) const {}
 
 	virtual void _shapes_changed() = 0;
 	void _set_space(RapierSpace2D *p_space);
-
-	_FORCE_INLINE_ bool is_static() const { return _static; }
 
 	RapierCollisionObject2D(Type p_type);
 
@@ -152,6 +152,8 @@ public:
 	void remove_shape(int p_index);
 
 	virtual void set_space(RapierSpace2D *p_space) = 0;
+
+	_FORCE_INLINE_ bool is_static() const { return _static; }
 
 	void set_pickable(bool p_pickable) { pickable = p_pickable; }
 	_FORCE_INLINE_ bool is_pickable() const { return pickable; }
