@@ -827,7 +827,6 @@ int RapierDirectSpaceState2D::_intersect_shape(const RID &shape_rid, const Trans
 
 bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *r_result) const {
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery
-	static int step = 0;
 	// Step 1: recover motion.
 	// Expand the body colliders by the margin (grow) and check if now it collides with a collider,
 	// if yes, "recover" / "push" out of this collider
