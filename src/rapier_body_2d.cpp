@@ -336,6 +336,8 @@ void RapierBody2D::set_mode(PhysicsServer2D::BodyMode p_mode) {
 	mode = p_mode;
 
 	if (p_mode == PhysicsServer2D::BODY_MODE_STATIC) {
+		_set_static(true);
+
 		force_sleep();
 
 		ERR_FAIL_COND(marked_active);
@@ -346,6 +348,8 @@ void RapierBody2D::set_mode(PhysicsServer2D::BodyMode p_mode) {
 
 		return;
 	}
+
+	_set_static(false);
 
 	if (active && (prev_mode == PhysicsServer2D::BODY_MODE_STATIC)) {
 		if (get_space()) {
@@ -1191,7 +1195,7 @@ RapierBody2D::RapierBody2D() :
 		gravity_update_list(this),
 		area_override_update_list(this),
 		direct_state_query_list(this) {
-	mode = PhysicsServer2D::BODY_MODE_RIGID;
+	_set_static(false);
 }
 
 RapierBody2D::~RapierBody2D() {

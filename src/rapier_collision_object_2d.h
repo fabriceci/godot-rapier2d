@@ -43,14 +43,13 @@ private:
 	uint32_t collision_mask = 1;
 	uint32_t collision_layer = 1;
 	real_t collision_priority = 1.0;
+	bool _static = true;
 
 	void _create_shape(Shape &shape, uint32_t p_shape_index);
 	void _destroy_shape(Shape &shape, uint32_t p_shape_index);
 	void _update_shape_transform(const Shape &shape);
 
 protected:
-	PhysicsServer2D::BodyMode mode = PhysicsServer2D::BODY_MODE_STATIC;
-
 	rapier2d::Handle body_handle = rapier2d::invalid_handle();
 	uint32_t area_detection_counter = 0;
 
@@ -63,6 +62,8 @@ protected:
 
 	virtual void _shapes_changed() = 0;
 	void _set_space(RapierSpace2D *p_space);
+
+	_FORCE_INLINE_ bool is_static() const { return _static; }
 
 	RapierCollisionObject2D(Type p_type);
 

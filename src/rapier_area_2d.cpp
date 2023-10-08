@@ -443,7 +443,7 @@ RapierArea2D::RapierArea2D() :
 		RapierCollisionObject2D(TYPE_AREA),
 		monitor_query_list(this),
 		area_override_update_list(this) {
-	mode = PhysicsServer2D::BODY_MODE_STATIC;
+	_set_static(true); //areas are not active by default
 }
 
 RapierArea2D::~RapierArea2D() {
