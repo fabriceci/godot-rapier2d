@@ -11,7 +11,7 @@ crate-type = ["staticlib"]	# Creates static lib
 
 [dependencies]
 #rapier2d = { features = [ "simd-stable"] }
-rapier2d = {git = "https://github.com/ughuuu/rapier", branch = "possible-fix-for-contacts", features = ["simd-stable"]}
+rapier2d = {git = "https://github.com/appsinacup/rapier", branch = "possible-fix-for-contacts", features = ["simd-stable"]}
 lazy_static = "1.4.0"
 
 [profile.release]
