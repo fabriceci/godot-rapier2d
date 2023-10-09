@@ -4,6 +4,7 @@
 #include "rapier_space_2d.h"
 
 #define TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR 0.05
+#define SMALL_MARGIN_FOR_NUMERICAL_ERRORS 0.1
 
 bool RapierBodyUtils2D::body_motion_recover(
 		const RapierSpace2D &p_space,
@@ -92,7 +93,6 @@ bool RapierBodyUtils2D::body_motion_recover(
 				// Compute plane on b towards a.
 				Vector2 n = Vector2(contact.normal1.x, contact.normal1.y);
 				// Move it outside as to fit the margin
-				a += p_margin * n;
 				real_t d = n.dot(b);
 
 				// Compute depth on recovered motion.
@@ -184,10 +184,10 @@ void RapierBodyUtils2D::cast_motion(
 			rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 			real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
 			{
-				// stuck logic
+				// stuck logic, check if body collides in place
 				rapier2d::Vector rapier_body_shape_step_pos_initial{ body_shape_pos.x, body_shape_pos.y };
-				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos_initial, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.1);
-				if (step_contact.collided && step_contact.distance < 0) {
+				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos_initial, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, SMALL_MARGIN_FOR_NUMERICAL_ERRORS);
+				if (step_contact.collided && !step_contact.within_margin) {
 					p_closest_safe = 0;
 					p_closest_unsafe = 0;
 					p_best_body_shape = body_shape_idx; //sadly it's the best
@@ -195,10 +195,10 @@ void RapierBodyUtils2D::cast_motion(
 				}
 			}
 			{
-				// no collision logic
+				// no collision logic at end of motion
 				rapier2d::Vector rapier_body_shape_pos{ body_shape_pos.x + p_motion.x, body_shape_pos.y + p_motion.y };
-				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.1);
-				if (!step_contact.collided || step_contact.distance >= 0) {
+				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, SMALL_MARGIN_FOR_NUMERICAL_ERRORS);
+				if (!step_contact.collided || (step_contact.collided && step_contact.within_margin)) {
 					continue;
 				}
 			}
@@ -220,9 +220,9 @@ void RapierBodyUtils2D::cast_motion(
 				real_t fraction = low + (hi - low) * fraction_coeff;
 
 				rapier2d::Vector rapier_body_shape_step_pos{ body_shape_pos.x + p_motion.x * fraction, body_shape_pos.y + p_motion.y * fraction };
-				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.1);
+				rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_step_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, SMALL_MARGIN_FOR_NUMERICAL_ERRORS);
 
-				if (step_contact.collided && step_contact.distance < 0) {
+				if (step_contact.collided && !step_contact.within_margin) {
 					hi = fraction;
 					if ((k == 0) || (low > 0.0)) { // Did it not collide before?
 						// When alternating or first iteration, use dichotomy.
@@ -344,9 +344,6 @@ bool RapierBodyUtils2D::body_motion_collide(
 			if (!contact.collided) {
 				continue;
 			}
-			Vector2 a(contact.point1.x, contact.point1.y);
-			Vector2 b(contact.point2.x, contact.point2.y);
-			contact.distance = contact.distance + p_margin;
 			if (contact.distance < min_distance) {
 				min_distance = contact.distance;
 				best_collision_body = collision_body;

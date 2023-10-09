@@ -244,6 +244,7 @@ impl ShapeCastResult {
 #[repr(C)]
 pub struct ContactResult {
     collided: bool,
+    within_margin: bool,
     distance: f32,
     point1 : Vector,
     point2 : Vector,
@@ -255,6 +256,7 @@ impl ContactResult {
     fn new() -> ContactResult {
         ContactResult {
             collided : false,
+            within_margin: false,
             distance : 0.0, 
             point1 : Vector{ x: 0.0, y: 0.0 },
             point2 : Vector{ x: 0.0, y: 0.0 },
@@ -1727,8 +1729,13 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
         &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
     ) {
         result.distance = contact.dist;
+        if contact.dist < 0.0 {
+            result.within_margin = false;
+        } else {
+            result.within_margin = true;
+        }
         result.collided = true;
-        result.point1 = Vector{ x: contact.point1.x, y: contact.point1.y };
+        result.point1 = Vector{ x: contact.point1.x + prediction * contact.normal1.x, y: contact.point1.y + prediction * contact.normal1.y };
         result.point2 = Vector{ x: contact.point2.x, y: contact.point2.y };
         result.normal1 = Vector{ x: contact.normal1.x, y: contact.normal1.y };
         result.normal2 = Vector{ x: contact.normal2.x, y: contact.normal2.y };
