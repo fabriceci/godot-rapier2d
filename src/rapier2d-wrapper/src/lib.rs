@@ -1728,6 +1728,8 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     if let Ok(Some(contact)) = parry::query::contact(
         &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
     ) {
+        // the distance is negative if there is intersection
+        // and positive if the objects are separated by distance less than margin
         result.distance = contact.dist;
         if contact.dist < 0.0 {
             result.within_margin = false;

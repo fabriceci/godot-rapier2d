@@ -841,6 +841,8 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 	margin_aabb = body_aabb.grow(margin);
 
 	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, margin_aabb);
+	// update body_aabb after recover
+	body_aabb.position = margin_aabb.position;
 	// Step 2: Cast motion.
 	// Try to to find what is the possible motion (how far it can move, it's a shapecast, when you try to find the safe point (max you can move without collision ))
 	real_t best_safe = 1.0;
@@ -860,6 +862,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		Vector2 unsafe_motion = p_motion * best_unsafe;
 		body_transform.columns[2] += unsafe_motion;
 		body_aabb.position += unsafe_motion;
+		// update margin aabb after cast_motion
 		margin_aabb.position = body_aabb.position;
 
 		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, margin_aabb, best_body_shape, p_margin, r_result);

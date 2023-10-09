@@ -12,7 +12,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 		Transform2D &p_transform,
 		real_t p_margin,
 		Vector2 &p_recover_motion,
-		Rect2 &p_body_aabb) {
+		Rect2 &p_margin_aabb) {
 	int shape_count = p_body.get_shape_count();
 	ERR_FAIL_COND_V(shape_count < 1, false);
 	real_t min_contact_depth = p_margin * TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR;
@@ -42,7 +42,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 	int recover_attempts = 4;
 	do {
 		rapier2d::PointHitInfo results[32];
-		int result_count = p_space.rapier_intersect_aabb(p_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
+		int result_count = p_space.rapier_intersect_aabb(p_margin_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
 		// Optimization
 		if (result_count == 0) {
 			break;
@@ -106,7 +106,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 		if (recovered) {
 			p_recover_motion += recover_step;
 			p_transform.columns[2] += recover_step;
-			p_body_aabb.position += recover_step;
+			p_margin_aabb.position += recover_step;
 		} else {
 			break;
 		}
