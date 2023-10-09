@@ -1726,8 +1726,13 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     
     let mut result = ContactResult::new();
     if let Ok(Some(contact)) = parry::query::contact(
-        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction
+        &shape_transform1, shared_shape1.as_ref(), &shape_transform2, shared_shape2.as_ref(), prediction * 1.1
     ) {
+        // we used at contact a bigger number, prediction * 1.1 in order to increase search range.
+        // now check if we are actually within the margin, if not, return no intersection.
+        if contact.dist > prediction {
+            return result;
+        }
         // the distance is negative if there is intersection
         // and positive if the objects are separated by distance less than margin
         result.distance = contact.dist;
