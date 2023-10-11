@@ -31,7 +31,9 @@ See [Building the C++ bindings](https://docs.godotengine.org/en/stable/tutorials
 
 ### Build the Rapier 2D wrapper
 
-Based on official Rapier lib (https://github.com/dimforge/rapier)
+Based on official Rapier lib (https://github.com/dimforge/rapier) with some changes.
+
+The rapier we use uses a different parry. Here is a [PR with changes for rapier](https://github.com/appsinacup/rapier/pull/1). Here is a [PR with changes for parry](https://github.com/appsinacup/parry/pull/1).
 
 Rapier sources will be automatically retrieved while building.
 
