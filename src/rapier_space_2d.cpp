@@ -861,7 +861,7 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		// update margin aabb after cast_motion
 		body_aabb.position += unsafe_motion;
 
-		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, p_motion, body_aabb, best_body_shape, p_margin, r_result);
+		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, body_aabb, best_body_shape, p_margin, r_result);
 	}
 
 	if (r_result) {
