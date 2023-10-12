@@ -827,25 +827,19 @@ int RapierDirectSpaceState2D::_intersect_shape(const RID &shape_rid, const Trans
 
 bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *r_result) const {
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery
-
 	// Step 1: recover motion.
 	// Expand the body colliders by the margin (grow) and check if now it collides with a collider,
 	// if yes, "recover" / "push" out of this collider
 	Vector2 recover_motion;
-	Rect2 body_aabb = p_body->get_aabb();
-	// Undo the currently transform the physics server is aware of and apply the provided one
-	body_aabb = body_transform.xform(body_aabb);
 	real_t margin = MAX(p_margin, TEST_MOTION_MARGIN_MIN_VALUE);
 
-	body_aabb = body_aabb.grow(margin);
-
-	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, p_margin, recover_motion, body_aabb);
+	bool recovered = RapierBodyUtils2D::body_motion_recover(*this, *p_body, body_transform, margin, recover_motion);
 	// Step 2: Cast motion.
 	// Try to to find what is the possible motion (how far it can move, it's a shapecast, when you try to find the safe point (max you can move without collision ))
 	real_t best_safe = 1.0;
 	real_t best_unsafe = 1.0;
 	int best_body_shape = -1;
-	RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, body_aabb, best_safe, best_unsafe, best_body_shape);
+	RapierBodyUtils2D::cast_motion(*this, *p_body, body_transform, p_motion, margin, best_safe, best_unsafe, best_body_shape);
 
 	// Step 3: Rest Info
 	// Apply the motion and fill the collision information
@@ -858,10 +852,8 @@ bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_
 		// Get the rest info in unsafe advance
 		Vector2 unsafe_motion = p_motion * best_unsafe;
 		body_transform.columns[2] += unsafe_motion;
-		// update margin aabb after cast_motion
-		body_aabb.position += unsafe_motion;
 
-		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, body_aabb, best_body_shape, p_margin, r_result);
+		collided = RapierBodyUtils2D::body_motion_collide(*this, *p_body, body_transform, p_motion, best_body_shape, margin, r_result);
 	}
 
 	if (r_result) {

@@ -10,11 +10,10 @@
 
 bool RapierBodyUtils2D::body_motion_recover(
 		const RapierSpace2D &p_space,
-		const RapierBody2D &p_body,
+		RapierBody2D &p_body,
 		Transform2D &p_transform,
 		real_t p_margin,
-		Vector2 &p_recover_motion,
-		Rect2 &p_margin_aabb) {
+		Vector2 &p_recover_motion) {
 	int shape_count = p_body.get_shape_count();
 	ERR_FAIL_COND_V(shape_count < 1, false);
 	real_t min_contact_depth = p_margin * TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR;
@@ -44,7 +43,13 @@ bool RapierBodyUtils2D::body_motion_recover(
 	int recover_attempts = BODY_MOTION_RECOVER_ATTEMPTS;
 	do {
 		rapier2d::PointHitInfo results[32];
-		int result_count = p_space.rapier_intersect_aabb(p_margin_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
+
+		Rect2 body_aabb = p_body.get_aabb();
+		// Undo the currently transform the physics server is aware of and apply the provided one
+		Rect2 margin_aabb = p_transform.xform(body_aabb);
+		margin_aabb = margin_aabb.grow(p_margin);
+
+		int result_count = p_space.rapier_intersect_aabb(margin_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
 		// Optimization
 		if (result_count == 0) {
 			break;
@@ -81,6 +86,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 				Vector2 col_shape_pos = col_shape_transform.get_origin();
 				rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 				real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
+				
 				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
 
 				if (!contact.collided) {
@@ -112,7 +118,6 @@ bool RapierBodyUtils2D::body_motion_recover(
 		if (recovered) {
 			p_recover_motion += recover_step;
 			p_transform.columns[2] += recover_step;
-			p_margin_aabb.position += recover_step;
 		}
 		recover_attempts--;
 	} while (recover_attempts);
@@ -122,16 +127,20 @@ bool RapierBodyUtils2D::body_motion_recover(
 
 void RapierBodyUtils2D::cast_motion(
 		const RapierSpace2D &p_space,
-		const RapierBody2D &p_body,
+		RapierBody2D &p_body,
 		const Transform2D &p_transform,
 		const Vector2 &p_motion,
-		const Rect2 &p_body_aabb,
+		real_t p_margin,
 		real_t &p_closest_safe,
 		real_t &p_closest_unsafe,
 		int &p_best_body_shape) {
-	Rect2 motion_aabb = p_body_aabb;
+	Rect2 body_aabb = p_body.get_aabb();
+	Rect2 margin_aabb = p_transform.xform(body_aabb);
+
+	margin_aabb = margin_aabb.grow(p_margin);
+	Rect2 motion_aabb = margin_aabb;
 	motion_aabb.position += p_motion;
-	motion_aabb = motion_aabb.merge(p_body_aabb);
+	motion_aabb = motion_aabb.merge(margin_aabb);
 
 	rapier2d::PointHitInfo results[32];
 	int result_count = p_space.rapier_intersect_aabb(motion_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
@@ -268,14 +277,22 @@ void RapierBodyUtils2D::cast_motion(
 
 bool RapierBodyUtils2D::body_motion_collide(
 		const RapierSpace2D &p_space,
-		const RapierBody2D &p_body,
+		RapierBody2D &p_body,
 		const Transform2D &p_transform,
-		const Rect2 &p_body_aabb,
+		const Vector2 &p_motion,
 		int p_best_body_shape,
 		real_t p_margin,
 		PhysicsServer2DExtensionMotionResult *p_result) {
 	int shape_count = p_body.get_shape_count();
 	ERR_FAIL_COND_V(shape_count < 1, false);
+	Rect2 body_aabb = p_body.get_aabb();
+	Rect2 margin_aabb = p_transform.xform(body_aabb);
+	margin_aabb = margin_aabb.grow(p_margin);
+	
+	// also check things at motion
+	Rect2 motion_aabb = margin_aabb;
+	motion_aabb.position += p_motion;
+	motion_aabb = motion_aabb.merge(margin_aabb);
 
 	// Create compound shape for the body if needed
 	/*rapier2d::Handle body_shape_handle;
@@ -300,7 +317,7 @@ bool RapierBodyUtils2D::body_motion_collide(
 	}*/
 
 	rapier2d::PointHitInfo results[32];
-	int result_count = p_space.rapier_intersect_aabb(p_body_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
+	int result_count = p_space.rapier_intersect_aabb(motion_aabb, p_body.get_collision_mask(), true, false, results, 32, &result_count, p_body.get_rid());
 	// Optimization
 	if (result_count == 0) {
 		return false;
@@ -348,8 +365,9 @@ bool RapierBodyUtils2D::body_motion_collide(
 			if (!contact.collided) {
 				continue;
 			}
-			if (contact.distance < min_distance) {
-				min_distance = contact.distance;
+			// compute distance without sign
+			if (p_margin - contact.distance < min_distance) {
+				min_distance = p_margin - contact.distance;
 				best_collision_body = collision_body;
 				best_collision_shape_index = shape_index;
 				best_body_shape_index = body_shape_idx;
