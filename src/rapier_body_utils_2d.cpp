@@ -5,8 +5,8 @@
 
 #define TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR 0.05
 #define SMALL_MARGIN_FOR_NUMERICAL_ERRORS 0.1
-#define BODY_MOTION_RECOVER_ATTEMPTS 8
-#define BODY_MOTION_RECOVER_RATIO 0.5
+#define BODY_MOTION_RECOVER_ATTEMPTS 4
+#define BODY_MOTION_RECOVER_RATIO 0.4
 
 bool RapierBodyUtils2D::body_motion_recover(
 		const RapierSpace2D &p_space,
@@ -365,9 +365,8 @@ bool RapierBodyUtils2D::body_motion_collide(
 			if (!contact.collided) {
 				continue;
 			}
-			// compute distance without sign
-			if (p_margin - contact.distance < min_distance) {
-				min_distance = p_margin - contact.distance;
+			if (contact.distance < min_distance) {
+				min_distance = contact.distance;
 				best_collision_body = collision_body;
 				best_collision_shape_index = shape_index;
 				best_body_shape_index = body_shape_idx;
@@ -386,7 +385,8 @@ bool RapierBodyUtils2D::body_motion_collide(
 			p_result->collision_point = Vector2(best_contact.point1.x, best_contact.point1.y);
 			// Normal from the collided object to get the contact normal
 			p_result->collision_normal = Vector2(best_contact.normal2.x, best_contact.normal2.y);
-			p_result->collision_depth = best_contact.distance;
+			// compute distance without sign
+			p_result->collision_depth = p_margin - best_contact.distance;
 
 			Vector2 local_position = p_result->collision_point - best_collision_body->get_transform().get_origin();
 			p_result->collider_velocity = best_collision_body->get_velocity_at_local_point(local_position);
