@@ -86,7 +86,7 @@ bool RapierBodyUtils2D::body_motion_recover(
 				Vector2 col_shape_pos = col_shape_transform.get_origin();
 				rapier2d::Vector rapier_col_shape_pos{ col_shape_pos.x, col_shape_pos.y };
 				real_t rapier_col_shape_rot = col_shape_transform.get_rotation();
-				
+
 				rapier2d::ContactResult contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, rapier_body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, p_margin);
 
 				if (!contact.collided) {
@@ -288,7 +288,7 @@ bool RapierBodyUtils2D::body_motion_collide(
 	Rect2 body_aabb = p_body.get_aabb();
 	Rect2 margin_aabb = p_transform.xform(body_aabb);
 	margin_aabb = margin_aabb.grow(p_margin);
-	
+
 	// also check things at motion
 	Rect2 motion_aabb = margin_aabb;
 	motion_aabb.position += p_motion;

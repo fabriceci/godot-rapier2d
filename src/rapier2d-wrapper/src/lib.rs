@@ -1729,7 +1729,7 @@ pub extern "C" fn shapes_contact(world_handle : Handle, shape_handle1 : Handle, 
     ) {
         // we used at contact a bigger number, prediction * 1.5 in order to increase search range.
         // now check if we are actually within the margin, if not, return no intersection.
-        if contact.dist > prediction{
+        if contact.dist > prediction {
             return result;
         }
         // the distance is negative if there is intersection
