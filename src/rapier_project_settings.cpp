@@ -76,14 +76,14 @@ void register_setting_ranged(
 }
 
 void RapierProjectSettings::register_settings() {
-	register_setting_plain(SOLVER_MIN_CCD_DT, 1.0 / 60.0 / 100.0);
-	register_setting_plain(SOLVER_ERP, 0.8, U"0,1,0.01,suffix:%");
-	register_setting_plain(SOLVER_DAMPING_RATIO, 0.25, U"0,1,0.01,suffix:%");
-	register_setting_plain(SOLVER_JOINT_ERP, 1, U"0,1,0.01,suffix:%");
-	register_setting_ranged(SOLVER_JOINT_DAMPING_RATIO, 0.25, U"0,1,0.01,suffix:%");
-	register_setting_ranged(SOLVER_ALLOWED_LINEAR_ERROR, 0.001, U"0,1,0.01,suffix:m");
-	register_setting_hinted(SOLVER_MAX_PENETRATION_CORRECTION, 3.40282e+38, U"suffix:m");
-	register_setting_plain(SOLVER_PREDICTION_DISTANCE, 0.002);
+	register_setting_ranged(SOLVER_MIN_CCD_DT, 1.0f / 60.0f / 100.0f, U"0.00001,1,0.00001,suffix:1/s");
+	register_setting_ranged(SOLVER_ERP, 0.8f, U"0.00001,1,0.00001,suffix:%");
+	register_setting_ranged(SOLVER_DAMPING_RATIO, 0.25f, U"0.00001,1,0.00001,suffix:%");
+	register_setting_ranged(SOLVER_JOINT_ERP, 1.0f, U"0.00001,1,0.00001,suffix:%");
+	register_setting_ranged(SOLVER_JOINT_DAMPING_RATIO, 0.25f, U"0.0001,1,0.00001,suffix:%");
+	register_setting_ranged(SOLVER_ALLOWED_LINEAR_ERROR, 0.001f, U"0,1,0.00001,suffix:m");
+	register_setting_ranged(SOLVER_MAX_PENETRATION_CORRECTION, 3.40282e+38f, U"0, 3.40282e+38f,1,suffix:m");
+	register_setting_ranged(SOLVER_PREDICTION_DISTANCE, 0.002f, U"0,1,0.00001,suffix:m");
 	register_setting_ranged(SOLVER_MAX_VELOCITY_ITERATIONS, 4, U"1,16,or_greater");
 	register_setting_ranged(SOLVER_MAX_VELOCITY_FRICTION_ITERATIONS, 8, U"1,16,or_greater");
 	register_setting_ranged(SOLVER_MAX_STABILIZATION_ITERATIONS, 1, U"1,16,or_greater");
@@ -112,45 +112,45 @@ int RapierProjectSettings::get_max_threads() {
 	return get_setting<int>(MAX_THREADS);
 }
 
-double RapierProjectSettings::get_solver_min_ccd_dt() {
-	return get_setting<double>(SOLVER_MIN_CCD_DT);
+float RapierProjectSettings::get_solver_min_ccd_dt() {
+	return get_setting<float>(SOLVER_MIN_CCD_DT);
 }
-double get_solver_erp() {
-	return get_setting<double>(SOLVER_MIN_CCD_DT);
+float RapierProjectSettings::get_solver_erp() {
+	return get_setting<float>(SOLVER_ERP);
 }
-double get_solver_damping_ratio() {
-	return get_setting<double>(SOLVER_DAMPING_RATIO);
+float RapierProjectSettings::get_solver_damping_ratio() {
+	return get_setting<float>(SOLVER_DAMPING_RATIO);
 }
-double get_solver_joint_erp() {
-	return get_setting<double>(SOLVER_JOINT_ERP);
+float RapierProjectSettings::get_solver_joint_erp() {
+	return get_setting<float>(SOLVER_JOINT_ERP);
 }
-double get_solver_joint_damping_ratio() {
-	return get_setting<double>(SOLVER_JOINT_DAMPING_RATIO);
+float RapierProjectSettings::get_solver_joint_damping_ratio() {
+	return get_setting<float>(SOLVER_JOINT_DAMPING_RATIO);
 }
-double get_solver_allowed_linear_error() {
-	return get_setting<double>(SOLVER_ALLOWED_LINEAR_ERROR);
+float RapierProjectSettings::get_solver_allowed_linear_error() {
+	return get_setting<float>(SOLVER_ALLOWED_LINEAR_ERROR);
 }
-double get_solver_max_penetration_correction() {
-	return get_setting<double>(SOLVER_MAX_PENETRATION_CORRECTION);
+float RapierProjectSettings::get_solver_max_penetration_correction() {
+	return get_setting<float>(SOLVER_MAX_PENETRATION_CORRECTION);
 }
-double get_solver_prediction_distance() {
-	return get_setting<double>(SOLVER_PREDICTION_DISTANCE);
+float RapierProjectSettings::get_solver_prediction_distance() {
+	return get_setting<float>(SOLVER_PREDICTION_DISTANCE);
 }
-int get_solver_max_velocity_iterations() {
+int RapierProjectSettings::get_solver_max_velocity_iterations() {
 	return get_setting<int>(SOLVER_MAX_VELOCITY_ITERATIONS);
 }
-int get_solver_max_velocity_friction_iterations() {
+int RapierProjectSettings::get_solver_max_velocity_friction_iterations() {
 	return get_setting<int>(SOLVER_MAX_VELOCITY_FRICTION_ITERATIONS);
 }
-int get_solver_max_stabilization_iterations() {
+int RapierProjectSettings::get_solver_max_stabilization_iterations() {
 	return get_setting<int>(SOLVER_MAX_STABILIZATION_ITERATIONS);
 }
-bool get_solver_interleave_restitution_and_friction_resolution() {
+bool RapierProjectSettings::get_solver_interleave_restitution_and_friction_resolution() {
 	return get_setting<bool>(SOLVER_INTERLEAVE_RESTITUTION_AND_FRICTION_RESOLUTION);
 }
-int get_solver_min_island_size() {
+int RapierProjectSettings::get_solver_min_island_size() {
 	return get_setting<int>(SOLVER_MIN_ISLAND_SIZE);
 }
-int get_solver_max_ccd_substeps() {
+int RapierProjectSettings::get_solver_max_ccd_substeps() {
 	return get_setting<int>(SOLVER_MAX_CCD_SUBSTEPS);
 }
