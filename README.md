@@ -6,8 +6,8 @@
 	<a href="https://github.com/fabriceci/godot-rapier2d/actions/workflows/runner.yml">
         <img src="https://github.com/fabriceci/godot-rapier2d/actions/workflows/runner.yml/badge.svg?branch=main"
             alt="chat on Discord"></a>
-    <a href="https://github.com/erincatto/box2d" alt="Box2D Version">
-        <img src="https://img.shields.io/badge/Box2D-v2.4.1-%23478cbf?logoColor=white" /></a>
+    <a href="https://github.com/dimforge/rapier/releases/tag/v0.17.2" alt="Box2D Version">
+        <img src="https://img.shields.io/badge/Rapier2D-v0.17.2-%23478cbf?logoColor=white" /></a>
     <a href="https://github.com/godotengine/godot-cpp" alt="Godot Version">
         <img src="https://img.shields.io/badge/Godot-v4.2-%23478cbf?logo=godot-engine&logoColor=white" /></a>
     <a href="https://github.com/fabriceci/godot-rapier2d/graphs/contributors" alt="Contributors">
