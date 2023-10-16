@@ -76,7 +76,7 @@ void register_setting_ranged(
 }
 
 void RapierProjectSettings::register_settings() {
-	register_setting_ranged(SOLVER_MIN_CCD_DT, 1.0f / 60.0f / 100.0f, U"0.00001,1,0.00001,suffix:1/s");
+	register_setting_ranged(SOLVER_MIN_CCD_DT, 1.0f / 60.0f / 100.0f, U"0.0000001,1,0.0000001,suffix:1/s");
 	register_setting_ranged(SOLVER_ERP, 0.8f, U"0.00001,1,0.00001,suffix:%");
 	register_setting_ranged(SOLVER_DAMPING_RATIO, 0.25f, U"0.00001,1,0.00001,suffix:%");
 	register_setting_ranged(SOLVER_JOINT_ERP, 1.0f, U"0.00001,1,0.00001,suffix:%");
