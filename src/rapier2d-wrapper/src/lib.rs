@@ -591,6 +591,28 @@ impl<'a> PhysicsHooks for PhysicsHooksCollisionFilter<'a> {
 
 		return true;
     }
+
+    fn modify_solver_contacts(&self, context: &mut ContactModificationContext) {
+        *context.normal = -*context.normal;
+        if context.rigid_body1.is_none() || context.rigid_body2.is_none() {
+            return;
+        }
+		let rigid_body1 = context.bodies.get(context.rigid_body1.unwrap());
+		let rigid_body2 = context.bodies.get(context.rigid_body1.unwrap());
+        if rigid_body1.is_none() || rigid_body2.is_none() {
+            return;
+        }
+        let mut rigid_body1 = rigid_body1.unwrap();
+        let mut rigid_body2 = rigid_body2.unwrap();
+
+        if rigid_body2.is_fixed() && !rigid_body1.is_fixed() {
+            (rigid_body2, rigid_body1) = (rigid_body1, rigid_body2);
+        }
+        // static and non static
+        if rigid_body1.is_fixed() && !rigid_body2.is_fixed() {
+            // TODO
+        }
+    }
 }
 
 struct PhysicsWorld {
@@ -1048,7 +1070,7 @@ pub extern "C" fn collider_create_solid(world_handle : Handle, shape_handle : Ha
     collider.set_restitution_combine_rule(CoefficientCombineRule::Max);
     collider.set_density(0.0);
 	collider.user_data = user_data.get_data();
-	collider.set_active_hooks(ActiveHooks::FILTER_CONTACT_PAIRS);
+	collider.set_active_hooks(ActiveHooks::FILTER_CONTACT_PAIRS & ActiveHooks::FILTER_INTERSECTION_PAIR & ActiveHooks::MODIFY_SOLVER_CONTACTS);
 	let physics_world = physics_engine.get_world(world_handle);
     return physics_world.insert_collider(collider, body_handle);
 }
