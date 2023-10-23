@@ -77,7 +77,6 @@ void RapierPinJoint2D::set_flag(PhysicsServer2D::PinJointFlag p_flag, bool p_ena
 	}
 	ERR_FAIL_COND(!rapier2d::is_handle_valid(space_handle));
 	ERR_FAIL_COND(!rapier2d::is_handle_valid(handle));
-	ERR_PRINT("limits " + rtos(angular_limit_lower) + " " + rtos(angular_limit_upper));
 	rapier2d::joint_change_revolute_params(space_handle, handle, angular_limit_lower, angular_limit_upper, angular_limit_enabled, motor_target_velocity, motor_enabled);
 }
 
