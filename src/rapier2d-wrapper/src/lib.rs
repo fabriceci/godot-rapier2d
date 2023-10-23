@@ -1517,7 +1517,7 @@ pub extern "C" fn joint_change_revolute_params(world_handle : Handle, joint_hand
         joint = joint.set_motor_velocity(motor_target_velocity, 0.0);
     }
     if angular_limit_enabled {
-        joint = joint.set_limits([angular_limit_lower, angular_limit_upper]);
+        joint.set_limits([angular_limit_lower, angular_limit_upper]);
     }
 }
 
