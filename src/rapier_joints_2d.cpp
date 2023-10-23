@@ -38,6 +38,9 @@ void RapierPinJoint2D::set_param(PhysicsServer2D::PinJointParam p_param, real_t 
 			motor_target_velocity = p_value;
 		} break;
 	}
+	ERR_FAIL_COND(!rapier2d::is_handle_valid(space_handle));
+	ERR_FAIL_COND(!rapier2d::is_handle_valid(handle));
+	rapier2d::joint_change_revolute_params(space_handle, handle, angular_limit_lower, angular_limit_upper, angular_limit_enabled, motor_target_velocity, motor_enabled);
 }
 
 real_t RapierPinJoint2D::get_param(PhysicsServer2D::PinJointParam p_param) const {
@@ -64,6 +67,9 @@ void RapierPinJoint2D::set_flag(PhysicsServer2D::PinJointFlag p_flag, bool p_ena
 			motor_enabled = p_enabled;
 		} break;
 	}
+	ERR_FAIL_COND(!rapier2d::is_handle_valid(space_handle));
+	ERR_FAIL_COND(!rapier2d::is_handle_valid(handle));
+	rapier2d::joint_change_revolute_params(space_handle, handle, angular_limit_lower, angular_limit_upper, angular_limit_enabled, motor_target_velocity, motor_enabled);
 }
 
 bool RapierPinJoint2D::get_flag(PhysicsServer2D::PinJointFlag p_flag) const {
@@ -93,7 +99,6 @@ RapierPinJoint2D::RapierPinJoint2D(const Vector2 &p_pos, RapierBody2D *p_body_a,
 	ERR_FAIL_COND(p_body_a->get_space() != p_body_b->get_space());
 	space_handle = p_body_a->get_space()->get_handle();
 	ERR_FAIL_COND(!rapier2d::is_handle_valid(space_handle));
-
 	handle = rapier2d::joint_create_revolute(space_handle, p_body_a->get_body_handle(), p_body_b->get_body_handle(), &rapier_anchor_A, &rapier_anchor_B, angular_limit_lower, angular_limit_upper, angular_limit_enabled, motor_target_velocity, motor_enabled);
 	ERR_FAIL_COND(!rapier2d::is_handle_valid(handle));
 

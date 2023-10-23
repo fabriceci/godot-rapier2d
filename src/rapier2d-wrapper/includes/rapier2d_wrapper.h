@@ -336,6 +336,14 @@ bool is_handle_valid(Handle handle);
 
 bool is_user_data_valid(UserData user_data);
 
+void joint_change_revolute_params(Handle world_handle,
+		Handle joint_handle,
+		float angular_limit_lower,
+		float angular_limit_upper,
+		bool angular_limit_enabled,
+		float motor_target_velocity,
+		bool motor_enabled);
+
 Handle joint_create_prismatic(Handle world_handle,
 		Handle body_handle_1,
 		Handle body_handle_2,
