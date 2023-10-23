@@ -25,10 +25,11 @@ A 2d [rapier](https://github.com/dimforge/rapier) physics server for [Godot Engi
 
 # Limitations
 
-- One way direction (WIP)
-- Spring Joint (WIP)
-- Static Body Constant Speed or Conveyer Belt (WIP)
-- Small issues with Character Controller (WIP)
+- One way direction missing(WIP)
+- Spring Joint missing(WIP)
+- Static Body Constant Speed or Conveyer Belt missing (WIP)
+- Shape scaling doesn't work (WIP)
+- Changing properties before they are added in world doesn't work (WIP)
 
 # Installation
 
