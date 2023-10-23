@@ -212,7 +212,7 @@ void RapierBodyUtils2D::cast_motion(
 				//rapier2d::Vector rapier_body_shape_pos{ body_shape_pos.x + p_motion.x, body_shape_pos.y + p_motion.y };
 				//rapier2d::ContactResult step_contact = rapier2d::shapes_contact(p_space.get_handle(), body_shape_handle, &rapier_body_shape_pos, body_shape_rot, col_shape_handle, &rapier_col_shape_pos, rapier_col_shape_rot, 0.0);
 				//if (!step_contact.collided || (step_contact.collided && step_contact.within_margin)) {
-					//continue;
+				//continue;
 				//}
 			}
 
