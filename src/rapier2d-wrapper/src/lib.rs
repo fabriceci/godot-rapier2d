@@ -1484,13 +1484,19 @@ pub extern "C" fn body_force_sleep(world_handle : Handle, body_handle : Handle) 
 // Joint interface
 
 #[no_mangle]
-pub extern "C" fn joint_create_revolute(world_handle : Handle, body_handle_1 : Handle, body_handle_2 : Handle, anchor_1 : &Vector, anchor_2 : &Vector) -> Handle {
+pub extern "C" fn joint_create_revolute(world_handle : Handle, body_handle_1 : Handle, body_handle_2 : Handle, anchor_1 : &Vector, anchor_2 : &Vector, angular_limit_lower: f32, angular_limit_upper: f32, angular_limit_enabled: bool, motor_target_velocity: f32, motor_enabled: bool) -> Handle {
     let mut physics_engine = SINGLETON.lock().unwrap();
 	let physics_world = physics_engine.get_world(world_handle);
 
-    let joint = RevoluteJointBuilder::new()
+    let mut joint = RevoluteJointBuilder::new()
     .local_anchor1(point!(anchor_1.x, anchor_1.y))
     .local_anchor2(point!(anchor_2.x, anchor_2.y));
+    if angular_limit_enabled {
+        joint = joint.limits([angular_limit_lower, angular_limit_upper]);
+    }
+    if motor_enabled {
+        joint = joint.motor_velocity(motor_target_velocity, 0.0);
+    }
     
 	return physics_world.insert_joint(body_handle_1, body_handle_2, joint);
 }
