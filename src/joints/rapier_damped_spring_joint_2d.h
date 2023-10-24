@@ -1,14 +1,9 @@
+#ifndef RAPIER_DAMPED_SPRING_JOINT_2D_H
+#define RAPIER_DAMPED_SPRING_JOINT_2D_H
+
+#include "rapier_joint_2d.h"
 
 class RapierDampedSpringJoint2D : public RapierJoint2D {
-	union {
-		struct {
-			RapierBody2D *A;
-			RapierBody2D *B;
-		};
-
-		RapierBody2D *_arr[2] = { nullptr, nullptr };
-	};
-
 	real_t rest_length = 0.0;
 	real_t damping = 1.5;
 	real_t stiffness = 20.0;
@@ -21,3 +16,5 @@ public:
 
 	RapierDampedSpringJoint2D(const Vector2 &p_anchor_a, const Vector2 &p_anchor_b, RapierBody2D *p_body_a, RapierBody2D *p_body_b);
 };
+
+#endif // RAPIER_DAMPED_SPRING_JOINT_2D_H

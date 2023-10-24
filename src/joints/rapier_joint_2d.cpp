@@ -1,6 +1,11 @@
 #include "rapier_joint_2d.h"
 #include "../spaces/rapier_space_2d.h"
 
+RapierJoint2D::RapierJoint2D(RapierBody2D *p_body_a, RapierBody2D *p_body_b = nullptr) {
+	A = p_body_a;
+	B = p_body_b;
+}
+
 void RapierJoint2D::copy_settings_from(RapierJoint2D *p_joint) {
 	set_rid(p_joint->get_rid());
 	set_max_force(p_joint->get_max_force());

@@ -1,8 +1,8 @@
-#ifndef RAPIER_SHAPE_2D_H
-#define RAPIER_SHAPE_2D_H
+#ifndef RAPIER_SPACE_2D_H
+#define RAPIER_SPACE_2D_H
 
-#include "rapier_area_2d.h"
-#include "rapier_body_2d.h"
+#include "../bodies/rapier_area_2d.h"
+#include "../bodies/rapier_body_2d.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/classes/physics_direct_space_state2d.hpp>
@@ -18,6 +18,7 @@
 using namespace godot;
 
 class RapierSpace2D;
+class RapierDirectSpaceState2D;
 
 class RapierSpace2D {
 	RapierDirectSpaceState2D *direct_access = nullptr;

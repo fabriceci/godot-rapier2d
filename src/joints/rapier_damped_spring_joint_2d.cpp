@@ -1,3 +1,4 @@
+#include "rapier_damped_spring_joint_2d.h"
 
 void RapierDampedSpringJoint2D::set_param(PhysicsServer2D::DampedSpringParam p_param, real_t p_value) {
 	switch (p_param) {
@@ -29,11 +30,8 @@ real_t RapierDampedSpringJoint2D::get_param(PhysicsServer2D::DampedSpringParam p
 	ERR_FAIL_V(0);
 }
 
-RapierDampedSpringJoint2D::RapierDampedSpringJoint2D(const Vector2 &p_anchor_a, const Vector2 &p_anchor_b, RapierBody2D *p_body_a, RapierBody2D *p_body_b) :
-		RapierJoint2D(_arr, 2) {
-	A = p_body_a;
-	B = p_body_b;
-
+RapierDampedSpringJoint2D::RapierDampedSpringJoint2D(const Vector2 &p_anchor_a, const Vector2 &p_anchor_b, RapierBody2D *p_body_a, RapierBody2D *p_body_b):
+RapierJoint2D(p_body_a, p_body_b){
 	Vector2 anchor_A = A->get_inv_transform().xform(p_anchor_a);
 	Vector2 anchor_B = B->get_inv_transform().xform(p_anchor_b);
 

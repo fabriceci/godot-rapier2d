@@ -1,4 +1,4 @@
-
+#include "rapier_direct_space_state_2d.h"
 
 int RapierDirectSpaceState2D::_intersect_point(const Vector2 &position, uint64_t canvas_instance_id, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, PhysicsServer2DExtensionShapeResult *r_results, int32_t p_result_max) {
 	ERR_FAIL_COND_V(space->locked, 0);

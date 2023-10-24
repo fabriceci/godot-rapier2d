@@ -8,10 +8,11 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/callable.hpp>
 
-#include "rapier_body_direct_state_2d.h"
-#include "rapier_physics_server_2d.h"
-#include "rapier_project_settings.h"
-#include "rapier_space_2d.h"
+#include "bodies/rapier_body_direct_state_2d.h"
+#include "servers/rapier_physics_server_2d.h"
+#include "servers/rapier_project_settings.h"
+#include "spaces/rapier_direct_space_state_2d.h"
+#include "spaces/rapier_space_2d.h"
 
 #if defined(WINDOWS_ENABLED)
 // Libs needed to link Rapier

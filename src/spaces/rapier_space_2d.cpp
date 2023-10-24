@@ -1,10 +1,13 @@
 #include "rapier_space_2d.h"
+#include "rapier_direct_space_state_2d.h"
 
-#include "rapier_body_utils_2d.h"
-#include "rapier_physics_server_2d.h"
-#include "rapier_project_settings.h"
+#include "../servers/rapier_body_utils_2d.h"
+#include "../servers/rapier_physics_server_2d.h"
+#include "../servers/rapier_project_settings.h"
 
 #include <godot_cpp/classes/project_settings.hpp>
+
+#define TEST_MOTION_MARGIN_MIN_VALUE 0.0001
 
 void RapierSpace2D::body_add_to_active_list(SelfList<RapierBody2D> *p_body) {
 	active_list.add(p_body);
@@ -112,8 +115,6 @@ bool RapierSpace2D::collision_filter_sensor_callback(rapier2d::Handle world_hand
 	return collision_filter_common_callback(world_handle, filter_info, colliders_info);
 }
 
-#define COLLISION_EVENT_LOG 0
-
 void RapierSpace2D::collision_event_callback(rapier2d::Handle world_handle, const rapier2d::CollisionEventInfo *event_info) {
 	RapierSpace2D *space = RapierPhysicsServer2D::singleton->get_active_space(world_handle);
 	ERR_FAIL_COND(!space);
@@ -165,20 +166,6 @@ void RapierSpace2D::collision_event_callback(rapier2d::Handle world_handle, cons
 		instanceId2 = pObject2->get_instance_id();
 		type2 = pObject2->get_type();
 	}
-
-#if COLLISION_EVENT_LOG
-	String frame_str(itos(RapierPhysicsServer2D::singleton->get_frame()));
-	String str_area("A");
-	String str_body("B");
-	String str_invalid("*/");
-	String str_valid("/");
-	String id1_str = (type1 == RapierCollisionObject2D::TYPE_AREA ? str_area : str_body) + (pObject1 ? str_valid : str_invalid) + itos(rid1.get_id()) + ":" + itos(shape1);
-	String id2_str = (type2 == RapierCollisionObject2D::TYPE_AREA ? str_area : str_body) + (pObject2 ? str_valid : str_invalid) + itos(rid2.get_id()) + ":" + itos(shape2);
-	String event_str(event_info->is_started ? "[COLLISION_ENTER]" : "[COLLISION_EXIT]");
-	String remove_str(event_info->is_removed ? " [REMOVED]" : "");
-	String sensor_str(event_info->is_sensor ? "SENSOR" : "CONTACT");
-	print_line("[" + frame_str + "] " + event_str + remove_str + " [" + sensor_str + "] " + itos(collider_handle1.id) + "(" + id1_str + ")" + " | " + itos(collider_handle2.id) + "(" + id2_str + ")");
-#endif
 
 	if (event_info->is_sensor) {
 		if (!instanceId1.is_valid()) {
@@ -650,7 +637,6 @@ RapierSpace2D::~RapierSpace2D() {
 
 	memdelete(direct_access);
 }
-#define TEST_MOTION_MARGIN_MIN_VALUE 0.0001
 
 bool RapierSpace2D::test_body_motion(RapierBody2D *p_body, const Transform2D &p_from, const Vector2 &p_motion, double p_margin, bool p_collide_separation_ray, bool p_recovery_as_collision, PhysicsServer2DExtensionMotionResult *r_result) const {
 	Transform2D body_transform = p_from; // Because body_transform needs to be modified during recovery

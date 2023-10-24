@@ -39,7 +39,9 @@ public:
 	void copy_settings_from(RapierJoint2D *p_joint);
 
 	virtual PhysicsServer2D::JointType get_type() const { return PhysicsServer2D::JOINT_TYPE_MAX; }
-
+	
+	RapierJoint2D(RapierBody2D *p_body_a, RapierBody2D *p_body_b = nullptr);
+	RapierJoint2D() {}
 	virtual ~RapierJoint2D();
 };
 
