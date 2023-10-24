@@ -81,9 +81,9 @@ void RapierProjectSettings::register_settings() {
 	register_setting_ranged(SOLVER_DAMPING_RATIO, 0.3, U"0.00001,1,0.00001,suffix:%");
 	register_setting_ranged(SOLVER_JOINT_ERP, 1.0, U"0.00001,1,0.00001,suffix:%");
 	register_setting_ranged(SOLVER_JOINT_DAMPING_RATIO, 0.25, U"0.0001,1,0.00001,suffix:%");
-	register_setting_ranged(SOLVER_ALLOWED_LINEAR_ERROR, 0.0001, U"0,1,0.00001,suffix:m");
+	register_setting_ranged(SOLVER_ALLOWED_LINEAR_ERROR, 0.00001, U"0,1,0.00001,suffix:m");
 	register_setting_ranged(SOLVER_MAX_PENETRATION_CORRECTION, 3.40282e+38, U"0, 3.40282e+38f,1,suffix:m");
-	register_setting_ranged(SOLVER_PREDICTION_DISTANCE, 0.0002, U"0,1,0.00001,suffix:m");
+	register_setting_ranged(SOLVER_PREDICTION_DISTANCE, 0.00002, U"0,1,0.00001,suffix:m");
 	register_setting_ranged(SOLVER_MAX_VELOCITY_ITERATIONS, 19, U"1,16,or_greater");
 	register_setting_ranged(SOLVER_MAX_VELOCITY_FRICTION_ITERATIONS, 29, U"1,16,or_greater");
 	register_setting_ranged(SOLVER_MAX_STABILIZATION_ITERATIONS, 9, U"1,16,or_greater");
