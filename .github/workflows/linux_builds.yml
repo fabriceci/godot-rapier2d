@@ -15,10 +15,8 @@ jobs:
       matrix:
         target: [template_debug, template_release]
         arch: [x86_64]
-        #precision: [single, double]
-        #features: [simd-stable, simd-nightly, parallel, enhanced-determinism]
-        precision: [single]
-        features: [simd-stable, enhanced-determinism]
+        precision: [single, double]
+        features: [simd-stable, simd-nightly, parallel, enhanced-determinism]
 
     steps:
       - uses: actions/checkout@v3
