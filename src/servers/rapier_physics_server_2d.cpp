@@ -4,14 +4,14 @@
 
 #include "../spaces/rapier_direct_space_state_2d.h"
 
-#include "../shapes/rapier_world_boundary_shape_2d.h"
-#include "../shapes/rapier_separation_ray_shape_2d.h"
-#include "../shapes/rapier_segment_shape_2d.h"
-#include "../shapes/rapier_circle_shape_2d.h"
-#include "../shapes/rapier_rectangle_shape_2d.h"
 #include "../shapes/rapier_capsule_shape_2d.h"
-#include "../shapes/rapier_convex_polygon_shape_2d.h"
+#include "../shapes/rapier_circle_shape_2d.h"
 #include "../shapes/rapier_concave_polygon_shape_2d.h"
+#include "../shapes/rapier_convex_polygon_shape_2d.h"
+#include "../shapes/rapier_rectangle_shape_2d.h"
+#include "../shapes/rapier_segment_shape_2d.h"
+#include "../shapes/rapier_separation_ray_shape_2d.h"
+#include "../shapes/rapier_world_boundary_shape_2d.h"
 
 #include "../joints/rapier_damped_spring_joint_2d.h"
 #include "../joints/rapier_groove_joint_2d.h"
@@ -987,33 +987,33 @@ void RapierPhysicsServer2D::_joint_set_param(const RID &p_joint, JointParam p_pa
 	ERR_FAIL_COND(!joint);
 
 	switch (p_param) {
-	case JOINT_PARAM_BIAS:
-		joint->set_bias(p_value);
-	 		break;
-	 	case JOINT_PARAM_MAX_BIAS:
-	 		joint->set_max_bias(p_value);
-	 		break;
-	 	case JOINT_PARAM_MAX_FORCE:
-	 		joint->set_max_force(p_value);
-	 		break;
-	 }
+		case JOINT_PARAM_BIAS:
+			joint->set_bias(p_value);
+			break;
+		case JOINT_PARAM_MAX_BIAS:
+			joint->set_max_bias(p_value);
+			break;
+		case JOINT_PARAM_MAX_FORCE:
+			joint->set_max_force(p_value);
+			break;
+	}
 }
 
 double RapierPhysicsServer2D::_joint_get_param(const RID &p_joint, JointParam p_param) const {
-	 const RapierJoint2D *joint = joint_owner.get_or_null(p_joint);
-	 ERR_FAIL_COND_V(!joint, -1);
+	const RapierJoint2D *joint = joint_owner.get_or_null(p_joint);
+	ERR_FAIL_COND_V(!joint, -1);
 
-	 switch (p_param) {
-	 	case JOINT_PARAM_BIAS:
-	 		return joint->get_bias();
-	 		break;
-	 	case JOINT_PARAM_MAX_BIAS:
-	 		return joint->get_max_bias();
-	 		break;
-	 	case JOINT_PARAM_MAX_FORCE:
-	 		return joint->get_max_force();
-	 		break;
-	 }
+	switch (p_param) {
+		case JOINT_PARAM_BIAS:
+			return joint->get_bias();
+			break;
+		case JOINT_PARAM_MAX_BIAS:
+			return joint->get_max_bias();
+			break;
+		case JOINT_PARAM_MAX_FORCE:
+			return joint->get_max_force();
+			break;
+	}
 }
 
 void RapierPhysicsServer2D::_joint_disable_collisions_between_bodies(const RID &p_joint, const bool p_disable) {

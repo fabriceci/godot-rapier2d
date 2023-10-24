@@ -9,6 +9,7 @@ class RapierSeparationRayShape2D : public RapierSegmentShape2D {
 
 protected:
 	virtual rapier2d::Handle create_rapier_shape() const override;
+
 public:
 	virtual PhysicsServer2D::ShapeType get_type() const override { return PhysicsServer2D::SHAPE_SEPARATION_RAY; }
 
