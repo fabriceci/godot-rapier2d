@@ -32,6 +32,8 @@ jobs:
           platform: macos
           rust_target: --target=x86_64-apple-darwin
           target: ${{ matrix.target }}
+          precision: ${{ matrix.precision }}
+          features: ${{ matrix.features }}
       
       - name: Sign frameworks
         shell: pwsh
@@ -47,3 +49,5 @@ jobs:
 
       - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
         uses: ./.github/actions/upload
+        precision: ${{ matrix.precision }}
+        features: ${{ matrix.features }}

@@ -64,7 +64,7 @@ runs:
         cd src/rapier2d-wrapper && mkdir release && rustup target add aarch64-apple-darwin && \
         cargo build --target=aarch64-apple-darwin --release --features=${{ inputs.features }} && \
         lipo -create -output target/release/librapier2d_wrapper.a target/aarch64-apple-darwin/release/librapier2d_wrapper.a target/x86_64-apple-darwin/release/librapier2d_wrapper.a
-    - name: Build Physics Server Rapier - Single and Double Precision
+    - name: Build Physics Server Rapier
       shell: sh
       env:
         SCONS_CACHE: .scons-cache

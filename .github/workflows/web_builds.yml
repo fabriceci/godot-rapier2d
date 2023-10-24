@@ -42,7 +42,11 @@ jobs:
           arch: ${{ matrix.arch }}
           platform: javascript
           target: ${{ matrix.target }}
+          precision: ${{ matrix.precision }}
+          features: ${{ matrix.features }}
 
       - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
         uses: ./.github/actions/upload
+        precision: ${{ matrix.precision }}
+        features: ${{ matrix.features }}
     

@@ -32,6 +32,10 @@ jobs:
           arch: ${{ matrix.arch }}
           platform: windows
           target: ${{ matrix.target }}
+          precision: ${{ matrix.precision }}
+          features: ${{ matrix.features }}
 
       - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
         uses: ./.github/actions/upload
+        precision: ${{ matrix.precision }}
+        features: ${{ matrix.features }}
