@@ -1,7 +1,7 @@
 #include "rapier_body_utils_2d.h"
-#include "rapier_body_2d.h"
-#include "rapier_shape_2d.h"
-#include "rapier_space_2d.h"
+#include "../bodies/rapier_body_2d.h"
+#include "../shapes/rapier_shape_2d.h"
+#include "../spaces/rapier_space_2d.h"
 
 #define TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR 0.05
 #define BODY_MOTION_RECOVER_ATTEMPTS 4

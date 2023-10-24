@@ -1,8 +1,8 @@
 #include "rapier_body_direct_state_2d.h"
 
+#include "../servers/rapier_physics_server_2d.h"
 #include "../spaces/rapier_direct_space_state_2d.h"
 #include "rapier_body_2d.h"
-#include "rapier_physics_server_2d.h"
 
 Vector2 RapierDirectBodyState2D::_get_total_gravity() const {
 	ERR_FAIL_COND_V(body->get_space(), Vector2());

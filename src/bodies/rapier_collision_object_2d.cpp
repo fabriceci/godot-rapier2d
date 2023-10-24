@@ -1,6 +1,7 @@
 #include "rapier_collision_object_2d.h"
-#include "rapier_physics_server_2d.h"
-#include "rapier_space_2d.h"
+
+#include "../servers/rapier_physics_server_2d.h"
+#include "../spaces/rapier_space_2d.h"
 
 void RapierCollisionObject2D::add_shape(RapierShape2D *p_shape, const Transform2D &p_transform, bool p_disabled) {
 	Shape shape;

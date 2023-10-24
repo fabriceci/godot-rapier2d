@@ -21,7 +21,8 @@ env.Append(LIBS=[lib])
 
 ## Sources
 env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+sources = [Glob("src/*.cpp"),Glob("src/bodies/*.cpp"),Glob("src/joints/*.cpp"),Glob("src/servers/*.cpp"),Glob("src/shapes/*.cpp"),Glob("src/spaces/*.cpp")]
+#sources = Glob("src/*.cpp")
 
 if env["platform"] == "windows":
     env.Append(CPPDEFINES="WINDOWS_ENABLED")

@@ -23,6 +23,10 @@
 
 A 2d [rapier](https://github.com/dimforge/rapier) physics server for [Godot Engine](https://github.com/godotengine/godot), implemented as a GDExtension.
 
+# Determinism
+
+Rapier is by default [locally deterministic](https://rapier.rs/docs/user_guides/rust/determinism/). There is also a build exported with cross-platform deterministic and one with parallel.
+
 # Limitations
 
 - One way direction missing(WIP)

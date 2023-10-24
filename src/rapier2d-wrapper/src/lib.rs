@@ -1,3 +1,5 @@
+#[cfg(feature = "f64")]
+extern crate rapier2d_f64 as rapier2d;
 mod body;
 mod collider;
 mod handle;
