@@ -1,4 +1,4 @@
-#include "rapier_body_direct_state_2d.h"
+#include "rapier_direct_body_state_2d.h"
 
 #include "../servers/rapier_physics_server_2d.h"
 #include "../spaces/rapier_direct_space_state_2d.h"

@@ -23,7 +23,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Build ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/build
         with:
           sconsflags: ${{ env.SCONSFLAGS }}
@@ -33,7 +33,7 @@ jobs:
           precision: ${{ matrix.precision }}
           features: ${{ matrix.features }}
 
-      - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Upload ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/upload
         with:
           precision: ${{ matrix.precision }}

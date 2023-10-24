@@ -1,7 +1,7 @@
 #include "rapier_body_2d.h"
 
 #include "../spaces/rapier_space_2d.h"
-#include "rapier_body_direct_state_2d.h"
+#include "rapier_direct_body_state_2d.h"
 
 void RapierBody2D::_mass_properties_changed() {
 	if (!get_space()) {

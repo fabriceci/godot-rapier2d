@@ -1,5 +1,5 @@
-#ifndef RAPIER_BODY_DIRECT_STATE_2D_H
-#define RAPIER_BODY_DIRECT_STATE_2D_H
+#ifndef RAPIER_DIRECT_BODY_STATE_2D_H
+#define RAPIER_DIRECT_BODY_STATE_2D_H
 
 #include <godot_cpp/classes/physics_direct_body_state2d.hpp>
 #include <godot_cpp/classes/physics_direct_body_state2d_extension.hpp>
@@ -78,4 +78,4 @@ public:
 	virtual double _get_step() const override;
 };
 
-#endif // RAPIER_BODY_DIRECT_STATE_2D_H
+#endif // RAPIER_DIRECT_BODY_STATE_2D_H

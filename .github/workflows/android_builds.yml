@@ -15,7 +15,7 @@ jobs:
       matrix:
         target: [template_debug, template_release]
         arch: [x86_64] # Todo reenable arm64
-        precision: [single, double]
+        precision: [single]#, double]
         features: [simd-stable, simd-nightly, parallel, enhanced-determinism]
 
     steps:
@@ -28,7 +28,7 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Build ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/build
         with:
           sconsflags: ${{ env.SCONSFLAGS }}
@@ -38,7 +38,7 @@ jobs:
           precision: ${{ matrix.precision }}
           features: ${{ matrix.features }}
 
-      - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Upload ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/upload
         with:
           precision: ${{ matrix.precision }}

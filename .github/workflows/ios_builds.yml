@@ -16,13 +16,13 @@ jobs:
         target: [template_debug, template_release]
         arch: [arm64]
         precision: [single, double]
-        features: [simd-stable, simd-nightly, parallel, enhanced-determinism]
+        features: [simd-stable], simd-nightly, parallel, enhanced-determinism]
 
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Build ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Build ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/build
         with:
           sconsflags: ${{ env.SCONSFLAGS }}
@@ -32,7 +32,7 @@ jobs:
           precision: ${{ matrix.precision }}
           features: ${{ matrix.features }}
 
-      - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
+      - name: Upload ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
         uses: ./.github/actions/upload
         with:
           precision: ${{ matrix.precision }}
