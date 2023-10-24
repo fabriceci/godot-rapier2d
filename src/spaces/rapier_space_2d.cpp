@@ -243,17 +243,9 @@ void RapierSpace2D::collision_event_callback(rapier2d::Handle world_handle, cons
 	}
 }
 
-RapierSpace2D *g_contact_events_space = nullptr;
-RapierBody2D *g_contact_events_body1 = nullptr;
-RapierBody2D *g_contact_events_body2 = nullptr;
-uint32_t g_contact_events_shape1 = 0;
-uint32_t g_contact_events_shape2 = 0;
-
 bool RapierSpace2D::contact_force_event_callback(rapier2d::Handle world_handle, const rapier2d::ContactForceEventInfo *event_info) {
 	RapierSpace2D *space = RapierPhysicsServer2D::singleton->get_active_space(world_handle);
 	ERR_FAIL_COND_V(!space, false);
-
-	g_contact_events_space = space;
 
 	bool send_contacts = false;
 
@@ -270,8 +262,6 @@ bool RapierSpace2D::contact_force_event_callback(rapier2d::Handle world_handle, 
 	}
 	ERR_FAIL_COND_V(!pObject1, false);
 	ERR_FAIL_COND_V(pObject1->get_type() != RapierCollisionObject2D::TYPE_BODY, false);
-	g_contact_events_body1 = static_cast<RapierBody2D *>(pObject1);
-	g_contact_events_shape1 = shape1;
 
 	uint32_t shape2 = 0;
 	RapierCollisionObject2D *pObject2 = nullptr;
@@ -280,22 +270,20 @@ bool RapierSpace2D::contact_force_event_callback(rapier2d::Handle world_handle, 
 	}
 	ERR_FAIL_COND_V(!pObject2, false);
 	ERR_FAIL_COND_V(pObject2->get_type() != RapierCollisionObject2D::TYPE_BODY, false);
-	g_contact_events_body2 = static_cast<RapierBody2D *>(pObject2);
-	g_contact_events_shape2 = shape2;
 
-	if (g_contact_events_body1->can_report_contacts()) {
+	if (static_cast<RapierBody2D *>(pObject1)->can_report_contacts()) {
 		send_contacts = true;
 	}
 
-	if (g_contact_events_body2->can_report_contacts()) {
+	if (static_cast<RapierBody2D *>(pObject2)->can_report_contacts()) {
 		send_contacts = true;
 	}
 
 	return send_contacts;
 }
 
-bool RapierSpace2D::contact_point_callback(rapier2d::Handle world_handle, const rapier2d::ContactPointInfo *contact_info) {
-	RapierSpace2D *space = g_contact_events_space;
+bool RapierSpace2D::contact_point_callback(rapier2d::Handle world_handle, const rapier2d::ContactPointInfo *contact_info, const rapier2d::ContactForceEventInfo *event_info) {
+	RapierSpace2D *space = RapierPhysicsServer2D::singleton->get_active_space(world_handle);
 	ERR_FAIL_COND_V(!space, false);
 	ERR_FAIL_COND_V(space->get_handle().id != world_handle.id, false);
 
@@ -311,11 +299,26 @@ bool RapierSpace2D::contact_point_callback(rapier2d::Handle world_handle, const 
 		space->add_debug_contact(pos2);
 	}
 #endif
-
-	ERR_FAIL_COND_V(!g_contact_events_body1, false);
-	RapierBody2D *body1 = g_contact_events_body1;
-	ERR_FAIL_COND_V(!g_contact_events_body2, false);
-	RapierBody2D *body2 = g_contact_events_body2;
+	// body and shape 1
+	uint32_t shape1 = 0;
+	RapierCollisionObject2D *pObject1 = nullptr;
+	if (rapier2d::is_user_data_valid(event_info->user_data1)) {
+		pObject1 = RapierCollisionObject2D::get_collider_user_data(event_info->user_data1, shape1);
+	}
+	ERR_FAIL_COND_V(!pObject1, false);
+	ERR_FAIL_COND_V(pObject1->get_type() != RapierCollisionObject2D::TYPE_BODY, false);
+	ERR_FAIL_COND_V(!pObject1, false);
+	RapierBody2D *body1 = static_cast<RapierBody2D *>(pObject1);
+	// body and shape 2
+	uint32_t shape2 = 0;
+	RapierCollisionObject2D *pObject2 = nullptr;
+	if (rapier2d::is_user_data_valid(event_info->user_data2)) {
+		pObject2 = RapierCollisionObject2D::get_collider_user_data(event_info->user_data2, shape2);
+	}
+	ERR_FAIL_COND_V(!pObject2, false);
+	ERR_FAIL_COND_V(pObject2->get_type() != RapierCollisionObject2D::TYPE_BODY, false);
+	ERR_FAIL_COND_V(!pObject2, false);
+	RapierBody2D *body2 = static_cast<RapierBody2D *>(pObject2);
 
 	real_t depth = MAX(0.0, -contact_info->distance); // negative distance means penetration
 
@@ -326,13 +329,13 @@ bool RapierSpace2D::contact_point_callback(rapier2d::Handle world_handle, const 
 	if (body1->can_report_contacts()) {
 		keep_sending_contacts = true;
 		Vector2 vel_pos2(contact_info->velocity_pos_2.x, contact_info->velocity_pos_2.y);
-		body1->add_contact(pos1, -normal, depth, (int)g_contact_events_shape1, pos2, (int)g_contact_events_shape2, body2->get_instance_id(), body2->get_rid(), vel_pos2, impulse);
+		body1->add_contact(pos1, -normal, depth, (int)shape1, pos2, (int)shape2, body2->get_instance_id(), body2->get_rid(), vel_pos2, impulse);
 	}
 
 	if (body2->can_report_contacts()) {
 		keep_sending_contacts = true;
 		Vector2 vel_pos1(contact_info->velocity_pos_1.x, contact_info->velocity_pos_1.y);
-		body2->add_contact(pos2, normal, depth, (int)g_contact_events_shape2, pos1, (int)g_contact_events_shape1, body1->get_instance_id(), body1->get_rid(), vel_pos1, impulse);
+		body2->add_contact(pos2, normal, depth, (int)shape2, pos1, (int)shape1, body1->get_instance_id(), body1->get_rid(), vel_pos1, impulse);
 	}
 
 	return keep_sending_contacts;
@@ -683,7 +686,7 @@ bool RapierSpace2D::rapier_shape_cast(rapier2d::Handle p_shape_handle, const Tra
 	int array_idx = 0;
 	do {
 		rapier2d::ShapeCastResult &result = p_results[cpt];
-		result = rapier2d::shape_casting(handle, &rapier_motion, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
+		result = rapier2d::shape_casting(handle, &rapier_motion, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, RapierSpace2D::_is_handle_excluded_callback, &handle_excluded_info);
 		if (!result.collided) {
 			break;
 		}
@@ -709,7 +712,7 @@ int RapierSpace2D::rapier_intersect_shape(rapier2d::Handle p_shape_handle, const
 	handle_excluded_info.query_exclude_size = 0;
 	handle_excluded_info.query_exclude_body = p_exclude_body.get_id();
 
-	return rapier2d::intersect_shape(handle, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
+	return rapier2d::intersect_shape(handle, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, &handle_excluded_info);
 }
 
 int RapierSpace2D::rapier_intersect_aabb(Rect2 p_aabb, uint32_t p_collision_mask, bool p_collide_with_bodies, bool p_collide_with_areas, rapier2d::PointHitInfo *p_results, int32_t p_max_results, int32_t *p_result_count, RID p_exclude_body) const {
@@ -723,5 +726,5 @@ int RapierSpace2D::rapier_intersect_aabb(Rect2 p_aabb, uint32_t p_collision_mask
 	handle_excluded_info.query_exclude_size = 0;
 	handle_excluded_info.query_exclude_body = p_exclude_body.get_id();
 
-	return rapier2d::intersect_aabb(handle, &rect_begin, &rect_end, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
+	return rapier2d::intersect_aabb(handle, &rect_begin, &rect_end, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, &handle_excluded_info);
 }

@@ -91,7 +91,7 @@ class RapierSpace2D {
 	static void collision_event_callback(rapier2d::Handle world_handle, const rapier2d::CollisionEventInfo *event_info);
 
 	static bool contact_force_event_callback(rapier2d::Handle world_handle, const rapier2d::ContactForceEventInfo *event_info);
-	static bool contact_point_callback(rapier2d::Handle world_handle, const rapier2d::ContactPointInfo *contact_info);
+	static bool contact_point_callback(rapier2d::Handle world_handle, const rapier2d::ContactPointInfo *contact_info, const rapier2d::ContactForceEventInfo *event_info);
 
 	static bool _is_handle_excluded_callback(const rapier2d::Handle world_handle, const rapier2d::Handle collider_handle, const rapier2d::UserData *collider, const rapier2d::QueryExcludedInfo *handle_excluded_info);
 

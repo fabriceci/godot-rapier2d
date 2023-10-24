@@ -23,8 +23,10 @@ struct Handle {
 	uint32_t generation;
 };
 
+#if defined(REAL_T_IS_DOUBLE)
 /// The scalar type used throughout this crate.
 using Real = double;
+#endif
 
 #if defined(REAL_T_IS_FLOAT)
 /// The scalar type used throughout this crate.
@@ -204,7 +206,9 @@ struct ContactPointInfo {
 	Real tangent_impulse;
 };
 
-using ContactPointCallback = bool (*)(Handle world_handle, const ContactPointInfo *contact_info);
+using ContactPointCallback = bool (*)(Handle world_handle,
+		const ContactPointInfo *contact_info,
+		const ContactForceEventInfo *event_info);
 
 extern "C" {
 

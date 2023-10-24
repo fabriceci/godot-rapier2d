@@ -54,7 +54,7 @@ usize_is_size_t = true
 # "target_os = freebsd" = "DEFINE_FREEBSD"
 # "feature = serde" = "DEFINE_SERDE"
 "feature = f32" = "REAL_T_IS_FLOAT"
-#"feature = f64" = "REAL_T_IS_FLOAT"
+"feature = f64" = "REAL_T_IS_DOUBLE"
 # Not needed
 "feature = spin_no_std" = "DEFINE_SPIN_NO_STD"
 

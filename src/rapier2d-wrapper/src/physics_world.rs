@@ -57,7 +57,7 @@ type ActiveBodyCallback = Option<extern "C" fn(world_handle : Handle, active_bod
 type CollisionEventCallback = Option<extern "C" fn(world_handle : Handle, event_info : &CollisionEventInfo)>;
 
 type ContactForceEventCallback = Option<extern "C" fn(world_handle : Handle, event_info : &ContactForceEventInfo) -> bool>;
-type ContactPointCallback = Option<extern "C" fn(world_handle : Handle, contact_info : &ContactPointInfo) -> bool>;
+type ContactPointCallback = Option<extern "C" fn(world_handle : Handle, contact_info : &ContactPointInfo, event_info : &ContactForceEventInfo) -> bool>;
 
 #[repr(C)]
 pub struct CollisionEventInfo {
@@ -307,7 +307,7 @@ impl PhysicsWorld {
                                 contact_info.impulse = contact_point.data.impulse;
                                 contact_info.tangent_impulse = contact_point.data.tangent_impulse;
                                 
-                                send_contact_points = contact_callback(self.handle, &contact_info);
+                                send_contact_points = contact_callback(self.handle, &contact_info, &event_info);
 								if !send_contact_points {
 									break;
 								}
@@ -483,7 +483,7 @@ pub extern "C" fn world_step(world_handle : Handle, settings : &SimulationSettin
 #[no_mangle]
 pub extern "C" fn world_set_active_body_callback(world_handle : Handle, callback : ActiveBodyCallback) {
 	let mut physics_engine = SINGLETON.lock().unwrap();
-	let physics_world = physics_engine.get_world(world_handle);
+	let physics_world: &mut PhysicsWorld = physics_engine.get_world(world_handle);
 	physics_world.active_body_callback = callback;
 }
 
