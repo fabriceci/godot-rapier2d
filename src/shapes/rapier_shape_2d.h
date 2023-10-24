@@ -1,5 +1,4 @@
-#ifndef RAPIER_SHAPE_2D_H
-#define RAPIER_SHAPE_2D_H
+#pragma once
 
 #include <godot_cpp/classes/physics_server2d.hpp>
 #include <godot_cpp/templates/hash_map.hpp>
@@ -23,7 +22,6 @@ class RapierShape2D {
 	RID rid;
 	Rect2 aabb;
 	bool configured = false;
-	real_t custom_bias = 0.0;
 
 	HashMap<RapierShapeOwner2D *, int> owners;
 
@@ -84,26 +82,22 @@ public:
 	virtual real_t get_moment_of_inertia(real_t p_mass, const Size2 &p_scale) const override { return 0.0; }
 };
 
-// class RapierSeparationRayShape2D : public RapierShape2D {
-// 	real_t length = 0.0;
-// 	bool slide_on_slope = false;
+class RapierSeparationRayShape2D : public RapierSegmentShape2D {
+	real_t length = 0.0;
+	bool slide_on_slope = false;
 
-// public:
+protected:
+	virtual rapier2d::Handle create_rapier_shape() const override;
+public:
+	virtual PhysicsServer2D::ShapeType get_type() const override { return PhysicsServer2D::SHAPE_SEPARATION_RAY; }
 
-// 	virtual PhysicsServer2D::ShapeType get_type() const override { return PhysicsServer2D::SHAPE_SEPARATION_RAY; }
+	virtual void apply_rapier_transform(rapier2d::Vector &position, real_t &angle) const override;
 
-// 	virtual bool allows_one_way_collision() const override { return false; }
+	virtual void set_data(const Variant &p_data) override;
+	virtual Variant get_data() const override;
 
-// 	virtual void set_data(const Variant &p_data) override;
-// 	virtual Variant get_data() const override;
-
-//	virtual real_t get_moment_of_inertia(real_t p_mass, const Size2& p_scale) const override;
-
-// 	DEFAULT_PROJECT_RANGE_CAST
-
-// 	_FORCE_INLINE_ RapierSeparationRayShape2D() {}
-// 	_FORCE_INLINE_ RapierSeparationRayShape2D(real_t p_length) { length = p_length; }
-// };
+	virtual real_t get_moment_of_inertia(real_t p_mass, const Size2 &p_scale) const override;
+};
 
 class RapierSegmentShape2D : public RapierShape2D {
 	Vector2 a;
@@ -124,13 +118,6 @@ public:
 	virtual Variant get_data() const override;
 
 	virtual real_t get_moment_of_inertia(real_t p_mass, const Size2 &p_scale) const override;
-
-	_FORCE_INLINE_ RapierSegmentShape2D() {}
-	_FORCE_INLINE_ RapierSegmentShape2D(const Vector2 &p_a, const Vector2 &p_b, const Vector2 &p_n) {
-		a = p_a;
-		b = p_b;
-		n = p_n;
-	}
 };
 
 class RapierCircleShape2D : public RapierShape2D {
@@ -228,5 +215,3 @@ public:
 
 	virtual real_t get_moment_of_inertia(real_t p_mass, const Size2 &p_scale) const override { return 0.0; }
 };
-
-#endif // RAPIER_SHAPE_2D_H

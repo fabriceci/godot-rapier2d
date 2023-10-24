@@ -1,0 +1,17 @@
+#include "rapier_joint_2d.h"
+#include "../spaces/rapier_space_2d.h"
+
+void RapierJoint2D::copy_settings_from(RapierJoint2D *p_joint) {
+	set_rid(p_joint->get_rid());
+	set_max_force(p_joint->get_max_force());
+	set_bias(p_joint->get_bias());
+	set_max_bias(p_joint->get_max_bias());
+	disable_collisions_between_bodies(p_joint->is_disabled_collisions_between_bodies());
+}
+
+RapierJoint2D::~RapierJoint2D() {
+	if (rapier2d::is_handle_valid(handle)) {
+		ERR_FAIL_COND(!rapier2d::is_handle_valid(space_handle));
+		rapier2d::joint_destroy(space_handle, handle);
+	}
+};

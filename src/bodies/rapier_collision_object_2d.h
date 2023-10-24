@@ -1,9 +1,8 @@
 #ifndef RAPIER_COLLISION_OBJECT_2D_H
 #define RAPIER_COLLISION_OBJECT_2D_H
 
-#include "rapier_shape_2d.h"
-
-#include "rapier_include.h"
+#include "../shapes/rapier_shape_2d.h"
+#include "../rapier_include.h"
 
 #include <godot_cpp/classes/physics_server2d.hpp>
 #include <godot_cpp/templates/local_vector.hpp>

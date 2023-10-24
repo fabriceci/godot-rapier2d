@@ -11,9 +11,9 @@ RID RapierPhysicsServer2D::_shape_create(ShapeType p_shape) {
 		case SHAPE_WORLD_BOUNDARY: {
 			shape = memnew(RapierWorldBoundaryShape2D);
 		} break;
-		// case SHAPE_SEPARATION_RAY: {
-		// 	shape = memnew(RapierSeparationRayShape2D);
-		// } break;
+		case SHAPE_SEPARATION_RAY: {
+			shape = memnew(RapierSeparationRayShape2D);
+		} break;
 		case SHAPE_SEGMENT: {
 			shape = memnew(RapierSegmentShape2D);
 		} break;
@@ -1008,19 +1008,6 @@ void RapierPhysicsServer2D::_joint_disable_collisions_between_bodies(const RID &
 	ERR_FAIL_COND(!joint);
 
 	joint->disable_collisions_between_bodies(p_disable);
-
-	if (2 == joint->get_body_count()) {
-		RapierBody2D *body_a = *joint->get_body_ptr();
-		RapierBody2D *body_b = *(joint->get_body_ptr() + 1);
-
-		if (p_disable) {
-			body_add_collision_exception(body_a->get_rid(), body_b->get_rid());
-			body_add_collision_exception(body_b->get_rid(), body_a->get_rid());
-		} else {
-			body_remove_collision_exception(body_a->get_rid(), body_b->get_rid());
-			body_remove_collision_exception(body_b->get_rid(), body_a->get_rid());
-		}
-	}
 }
 
 bool RapierPhysicsServer2D::_joint_is_disabled_collisions_between_bodies(const RID &p_joint) const {

@@ -1,5 +1,5 @@
-#ifndef RAPIER_SPACE_2D_H
-#define RAPIER_SPACE_2D_H
+#ifndef RAPIER_SHAPE_2D_H
+#define RAPIER_SHAPE_2D_H
 
 #include "rapier_area_2d.h"
 #include "rapier_body_2d.h"
@@ -18,29 +18,6 @@
 using namespace godot;
 
 class RapierSpace2D;
-
-class RapierDirectSpaceState2D : public PhysicsDirectSpaceState2DExtension {
-	GDCLASS(RapierDirectSpaceState2D, PhysicsDirectSpaceState2DExtension);
-
-protected:
-	static void _bind_methods() {}
-
-private:
-	enum RID_TYPE { RID_TYPE_BODY,
-		RID_TYPE_SHAPE };
-	void _hashset_rid_to_handle(rapier2d::Handle *r_rapier_exclude, uint32_t *r_rapier_exclude_size, const HashSet<RID> &exclude, RID_TYPE p_rid_type = RID_TYPE_BODY);
-
-public:
-	RapierSpace2D *space = nullptr;
-	virtual int _intersect_point(const Vector2 &position, uint64_t canvas_instance_id, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, PhysicsServer2DExtensionShapeResult *r_results, int32_t p_result_max) override;
-	virtual bool _intersect_ray(const Vector2 &from, const Vector2 &to, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, bool hit_from_inside, PhysicsServer2DExtensionRayResult *r_result) override;
-	virtual int _intersect_shape(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, PhysicsServer2DExtensionShapeResult *r_results, int32_t p_result_max) override;
-	virtual bool _cast_motion(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, real_t *p_closest_safe, real_t *p_closest_unsafe) override;
-	virtual bool _collide_shape(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, void *results, int32_t max_results, int32_t *result_count) override;
-	virtual bool _rest_info(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, PhysicsServer2DExtensionShapeRestInfo *r_info) override { return false; }
-
-	RapierDirectSpaceState2D() {}
-};
 
 class RapierSpace2D {
 	RapierDirectSpaceState2D *direct_access = nullptr;

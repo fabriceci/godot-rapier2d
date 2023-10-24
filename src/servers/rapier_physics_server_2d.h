@@ -12,11 +12,11 @@
 
 #include <godot_cpp/templates/rid_owner.hpp>
 
-#include "rapier_area_2d.h"
-#include "rapier_body_2d.h"
-#include "rapier_joints_2d.h"
-#include "rapier_shape_2d.h"
-#include "rapier_space_2d.h"
+#include "../bodies/rapier_area_2d.h"
+#include "../bodies/rapier_body_2d.h"
+#include "../joints/rapier_joints_2d.h"
+#include "../shapes/rapier_shape_2d.h"
+#include "../spaces/rapier_space_2d.h"
 
 #include "rapier_include.h"
 
