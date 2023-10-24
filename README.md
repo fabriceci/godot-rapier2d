@@ -42,11 +42,7 @@ This plugin is built for both single and double precision builds.
 This package supports the following features of rapier ([more on this here](https://rapier.rs/docs/user_guides/rust/getting_started)):
 
 - simd-stable: enables explicit SIMD optimizations using the wide crate. Has limited cross-platform support but can be used with a stable version of the Rust compiler.
-- simd-nightly: enables explicit SIMD optimizations using the packed_simd crate. Has a great cross-platform support but requires a nightly version of the Rust compiler.
-- parallel: enables parallelism of the physics pipeline with the rayon crate.
 - enhanced-determinism: enables cross-platform determinism (assuming the rest of your code is also deterministic) across all 32-bit and 64-bit platforms that implements the IEEE 754-2008 standard strictly. This includes most modern processors as well as WASM targets.
-
-Enabling parallelism is only useful if the scene being simulated has a high number of moving rigid-bodies, colliders, and/or joints. If the simulation isn't sufficiently complex, the parallelism may actually make the simulation slower because of the parallelism overhead.
 
 # Installation
 
