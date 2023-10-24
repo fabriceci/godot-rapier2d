@@ -1,7 +1,7 @@
 #include "rapier_capsule_shape_2d.h"
 
 rapier2d::Handle RapierCapsuleShape2D::create_rapier_shape() const {
-	return rapier2d::shape_create_capsule((height / 2) - radius, radius);
+	return rapier2d::shape_create_capsule((height / 2.0) - radius, radius);
 }
 
 void RapierCapsuleShape2D::set_data(const Variant &p_data) {
@@ -19,7 +19,7 @@ void RapierCapsuleShape2D::set_data(const Variant &p_data) {
 	}
 
 	Point2 he(radius, height * 0.5);
-	configure(Rect2(-he, he * 2));
+	configure(Rect2(-he, he * 2.0));
 }
 
 Variant RapierCapsuleShape2D::get_data() const {

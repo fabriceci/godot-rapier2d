@@ -42,7 +42,7 @@ pub extern "C" fn collider_create_sensor(world_handle : Handle, shape_handle : H
     collider.set_sensor(true);
 	collider.set_active_events(ActiveEvents::COLLISION_EVENTS);
 	let mut collision_types = collider.active_collision_types();
-	collision_types |= ActiveCollisionTypes::FIXED_FIXED;
+	collision_types |= ActiveCollisionTypes::KINEMATIC_KINEMATIC;
 	collider.set_active_collision_types(collision_types);
 	collider.user_data = user_data.get_data();
 	collider.set_active_hooks(ActiveHooks::FILTER_INTERSECTION_PAIR);

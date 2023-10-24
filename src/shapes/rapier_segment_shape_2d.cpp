@@ -5,12 +5,12 @@ rapier2d::Handle RapierSegmentShape2D::create_rapier_shape() const {
 	direction.normalize();
 
 	Vector2 perpendicular = Vector2(-direction.y, direction.x);
-	float height = 0.1;
+	double height = 0.1;
 
-	Vector2 p1 = a + perpendicular * height / 2;
-	Vector2 p2 = a - perpendicular * height / 2;
-	Vector2 p3 = b + perpendicular * height / 2;
-	Vector2 p4 = b - perpendicular * height / 2;
+	Vector2 p1 = a + perpendicular * height / 2.0;
+	Vector2 p2 = a - perpendicular * height / 2.0;
+	Vector2 p3 = b + perpendicular * height / 2.0;
+	Vector2 p4 = b - perpendicular * height / 2.0;
 
 	rapier2d::Vector rapier_points[4];
 	rapier_points[0] = rapier2d::Vector{ p1.x, p1.y };
@@ -49,5 +49,5 @@ Variant RapierSegmentShape2D::get_data() const {
 }
 
 real_t RapierSegmentShape2D::get_moment_of_inertia(real_t p_mass, const Size2 &p_scale) const {
-	return p_mass * ((a * p_scale).distance_squared_to(b * p_scale)) / 12;
+	return p_mass * ((a * p_scale).distance_squared_to(b * p_scale)) / 12.0;
 }
