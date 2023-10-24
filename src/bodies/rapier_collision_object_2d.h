@@ -3,10 +3,10 @@
 
 #include "../shapes/rapier_shape_2d.h"
 
+#include "../rapier_include.h"
 #include <godot_cpp/classes/physics_server2d.hpp>
 #include <godot_cpp/templates/local_vector.hpp>
 #include <godot_cpp/templates/self_list.hpp>
-#include "../rapier_include.h"
 
 using namespace godot;
 
