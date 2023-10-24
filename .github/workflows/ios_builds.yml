@@ -9,7 +9,7 @@ env:
 jobs:
   ios:
     runs-on: "macos-latest"
-    name: iOS Build ${{ matrix.target }} ${{ matrix.arch }}
+    name: ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
     strategy:
       fail-fast: false
       matrix:

@@ -11,7 +11,7 @@ env:
 jobs:
   web:
     runs-on: ubuntu-20.04
-    name: Web Build ${{ matrix.target }} ${{ matrix.arch }}
+    name: ${{ matrix.target }} ${{ matrix.arch }} ${{ matrix.precision }} ${{ matrix.features }}
     strategy:
       fail-fast: false
       matrix:
