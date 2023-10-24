@@ -11,6 +11,7 @@ class RapierPinJoint2D : public RapierJoint2D {
 	real_t motor_target_velocity = 0.0;
 	bool motor_enabled = false;
 	bool angular_limit_enabled = false;
+
 public:
 	virtual PhysicsServer2D::JointType get_type() const override { return PhysicsServer2D::JOINT_TYPE_PIN; }
 
@@ -19,8 +20,8 @@ public:
 
 	void set_flag(PhysicsServer2D::PinJointFlag p_flag, bool p_enabled);
 	bool get_flag(PhysicsServer2D::PinJointFlag p_flag) const;
-    
-    RapierPinJoint2D(const Vector2 &p_pos, RapierBody2D *p_body_a, RapierBody2D *p_body_b = nullptr);
+
+	RapierPinJoint2D(const Vector2 &p_pos, RapierBody2D *p_body_a, RapierBody2D *p_body_b = nullptr);
 };
 
 #endif // RAPIER_PIN_JOINT_2D_H

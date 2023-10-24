@@ -93,7 +93,7 @@ class RapierSpace2D {
 	static bool contact_force_event_callback(rapier2d::Handle world_handle, const rapier2d::ContactForceEventInfo *event_info);
 	static bool contact_point_callback(rapier2d::Handle world_handle, const rapier2d::ContactPointInfo *contact_info);
 
-	static bool _is_handle_excluded_callback(const rapier2d::Handle world_handle, const rapier2d::Handle collider_handle, const rapier2d::UserData *collider);
+	static bool _is_handle_excluded_callback(const rapier2d::Handle world_handle, const rapier2d::Handle collider_handle, const rapier2d::UserData *collider, const rapier2d::QueryExcludedInfo *handle_excluded_info);
 
 	static Object *_get_object_instance_hack(uint64_t p_object_id) {
 		return reinterpret_cast<Object *>((GodotObject *)(internal::gdextension_interface_object_get_instance_from_id(p_object_id)));

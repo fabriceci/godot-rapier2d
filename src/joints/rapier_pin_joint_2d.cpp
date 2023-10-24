@@ -67,9 +67,8 @@ bool RapierPinJoint2D::get_flag(PhysicsServer2D::PinJointFlag p_flag) const {
 	ERR_FAIL_V(0);
 }
 
-RapierPinJoint2D::RapierPinJoint2D(const Vector2 &p_pos, RapierBody2D *p_body_a, RapierBody2D *p_body_b):
-    RapierJoint2D(p_body_a, p_body_b){
-
+RapierPinJoint2D::RapierPinJoint2D(const Vector2 &p_pos, RapierBody2D *p_body_a, RapierBody2D *p_body_b) :
+		RapierJoint2D(p_body_a, p_body_b) {
 	Vector2 anchor_A = p_body_a->get_inv_transform().xform(p_pos);
 	Vector2 anchor_B = p_body_b ? p_body_b->get_inv_transform().xform(p_pos) : p_pos;
 

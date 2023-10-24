@@ -406,30 +406,10 @@ void RapierSpace2D::step(real_t p_step) {
 	}
 }
 
-uint32_t g_query_collision_layer_mask = 0;
-ObjectID g_query_canvas_instance_id;
-rapier2d::Handle *g_query_exclude = nullptr;
-uint32_t g_query_exclude_size = 0;
-RID *g_query_exclude_body = nullptr;
-
-struct QueryCallbackScope {
-	QueryCallbackScope(uint32_t collision_layer_mask) {
-		g_query_collision_layer_mask = collision_layer_mask;
-	}
-
-	~QueryCallbackScope() {
-		g_query_collision_layer_mask = 0;
-		g_query_canvas_instance_id = ObjectID();
-		g_query_exclude = nullptr;
-		g_query_exclude_size = 0;
-		g_query_exclude_body = nullptr;
-	}
-};
-
 // Returns true to ignore the collider
-bool RapierSpace2D::_is_handle_excluded_callback(const rapier2d::Handle world_handle, const rapier2d::Handle collider_handle, const rapier2d::UserData *user_data) {
-	for (uint32_t exclude_index = 0; exclude_index < g_query_exclude_size; ++exclude_index) {
-		if (rapier2d::are_handles_equal(g_query_exclude[exclude_index], collider_handle)) {
+bool RapierSpace2D::_is_handle_excluded_callback(const rapier2d::Handle world_handle, const rapier2d::Handle collider_handle, const rapier2d::UserData *user_data, const rapier2d::QueryExcludedInfo *handle_excluded_info) {
+	for (uint32_t exclude_index = 0; exclude_index < handle_excluded_info->query_exclude_size; ++exclude_index) {
+		if (rapier2d::are_handles_equal(handle_excluded_info->query_exclude[exclude_index], collider_handle)) {
 			return true;
 		}
 	}
@@ -440,17 +420,15 @@ bool RapierSpace2D::_is_handle_excluded_callback(const rapier2d::Handle world_ha
 	RapierCollisionObject2D *collision_object_2d = RapierCollisionObject2D::get_collider_user_data(*user_data, shape_index);
 	ERR_FAIL_COND_V(!collision_object_2d, false);
 
-	if (g_query_canvas_instance_id.is_valid()) {
-		if (g_query_canvas_instance_id != collision_object_2d->get_canvas_instance_id()) {
-			return true;
-		}
-	}
-
-	if (0 == (collision_object_2d->get_collision_layer() & g_query_collision_layer_mask)) {
+	if (handle_excluded_info->query_canvas_instance_id != ((uint64_t)collision_object_2d->get_canvas_instance_id())) {
 		return true;
 	}
 
-	if (g_query_exclude_body && *g_query_exclude_body == collision_object_2d->get_rid()) {
+	if (0 == (collision_object_2d->get_collision_layer() & handle_excluded_info->query_collision_layer_mask)) {
+		return true;
+	}
+
+	if (handle_excluded_info->query_exclude_body == collision_object_2d->get_rid().get_id()) {
 		return true;
 	}
 
@@ -696,20 +674,21 @@ bool RapierSpace2D::rapier_shape_cast(rapier2d::Handle p_shape_handle, const Tra
 	rapier2d::Vector rapier_pos{ p_transform.get_origin().x, p_transform.get_origin().y };
 	real_t rotation = p_transform.get_rotation();
 
-	QueryCallbackScope queryCallback(p_collision_mask);
-	g_query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
-	g_query_exclude_size = 0;
+	rapier2d::QueryExcludedInfo handle_excluded_info = rapier2d::default_query_excluded_info();
+	handle_excluded_info.query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
+	handle_excluded_info.query_collision_layer_mask = p_collision_mask;
+	handle_excluded_info.query_exclude_size = 0;
 
 	int cpt = 0;
 	int array_idx = 0;
 	do {
 		rapier2d::ShapeCastResult &result = p_results[cpt];
-		result = rapier2d::shape_casting(handle, &rapier_motion, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, RapierSpace2D::_is_handle_excluded_callback);
+		result = rapier2d::shape_casting(handle, &rapier_motion, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
 		if (!result.collided) {
 			break;
 		}
 		(*p_result_count)++;
-		g_query_exclude[g_query_exclude_size++] = result.collider;
+		handle_excluded_info.query_exclude[handle_excluded_info.query_exclude_size++] = result.collider;
 		cpt++;
 	} while (cpt < p_max_results);
 
@@ -724,12 +703,13 @@ int RapierSpace2D::rapier_intersect_shape(rapier2d::Handle p_shape_handle, const
 	rapier2d::Vector rapier_pos{ p_transform.get_origin().x, p_transform.get_origin().y };
 	real_t rotation = p_transform.get_rotation();
 
-	QueryCallbackScope queryCallback(p_collision_mask);
-	g_query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
-	g_query_exclude_size = 0;
-	g_query_exclude_body = &p_exclude_body;
+	rapier2d::QueryExcludedInfo handle_excluded_info = rapier2d::default_query_excluded_info();
+	handle_excluded_info.query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
+	handle_excluded_info.query_collision_layer_mask = p_collision_mask;
+	handle_excluded_info.query_exclude_size = 0;
+	handle_excluded_info.query_exclude_body = p_exclude_body.get_id();
 
-	return rapier2d::intersect_shape(handle, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback);
+	return rapier2d::intersect_shape(handle, &rapier_pos, rotation, p_shape_handle, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
 }
 
 int RapierSpace2D::rapier_intersect_aabb(Rect2 p_aabb, uint32_t p_collision_mask, bool p_collide_with_bodies, bool p_collide_with_areas, rapier2d::PointHitInfo *p_results, int32_t p_max_results, int32_t *p_result_count, RID p_exclude_body) const {
@@ -737,10 +717,11 @@ int RapierSpace2D::rapier_intersect_aabb(Rect2 p_aabb, uint32_t p_collision_mask
 
 	rapier2d::Vector rect_begin{ p_aabb.position.x, p_aabb.position.y };
 	rapier2d::Vector rect_end{ p_aabb.get_end().x, p_aabb.get_end().y };
-	QueryCallbackScope queryCallback(p_collision_mask);
-	g_query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
-	g_query_exclude_size = 0;
-	g_query_exclude_body = &p_exclude_body;
+	rapier2d::QueryExcludedInfo handle_excluded_info = rapier2d::default_query_excluded_info();
+	handle_excluded_info.query_exclude = (rapier2d::Handle *)alloca((p_max_results) * sizeof(rapier2d::Handle));
+	handle_excluded_info.query_collision_layer_mask = p_collision_mask;
+	handle_excluded_info.query_exclude_size = 0;
+	handle_excluded_info.query_exclude_body = p_exclude_body.get_id();
 
-	return rapier2d::intersect_aabb(handle, &rect_begin, &rect_end, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback);
+	return rapier2d::intersect_aabb(handle, &rect_begin, &rect_end, p_collide_with_bodies, p_collide_with_areas, p_results, p_max_results, RapierSpace2D::_is_handle_excluded_callback, handle_excluded_info);
 }

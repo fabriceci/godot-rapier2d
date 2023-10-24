@@ -71,10 +71,32 @@ impl ContactResult {
     }
 }
 
-type QueryHandleExcludedCallback = Option<extern "C" fn(world_handle : Handle, collider_handle : Handle, user_data : &UserData) -> bool>;
+#[repr(C)]
+pub struct QueryExcludedInfo {
+    query_collision_layer_mask: u32,
+    query_canvas_instance_id: u64,
+    // Pointer to array of objects
+    query_exclude: * mut Handle,
+    // Size of query_exclude array
+    query_exclude_size: u32,
+    query_exclude_body: i64,
+}
 
 #[no_mangle]
-pub extern "C" fn intersect_ray(world_handle : Handle, from : &Vector, dir : &Vector, length: Real, collide_with_body: bool, collide_with_area: bool, hit_from_inside: bool, hit_info : &mut RayHitInfo, handle_excluded_callback: QueryHandleExcludedCallback) -> bool {
+pub extern "C" fn default_query_excluded_info() -> QueryExcludedInfo {
+    QueryExcludedInfo {
+        query_collision_layer_mask: 0,
+        query_canvas_instance_id: 0,
+        query_exclude: &mut Handle::default(),
+        query_exclude_size: 0,
+        query_exclude_body: 0,
+    }
+}
+
+type QueryHandleExcludedCallback = Option<extern "C" fn(world_handle : Handle, collider_handle : Handle, user_data : &UserData, handle_excluded_info: &QueryExcludedInfo) -> bool>;
+
+#[no_mangle]
+pub extern "C" fn intersect_ray(world_handle : Handle, from : &Vector, dir : &Vector, length: Real, collide_with_body: bool, collide_with_area: bool, hit_from_inside: bool, hit_info : &mut RayHitInfo, handle_excluded_callback: QueryHandleExcludedCallback, handle_excluded_info: &QueryExcludedInfo) -> bool {
     let mut physics_engine = SINGLETON.lock().unwrap();
 	let physics_world = physics_engine.get_world(world_handle);
 
@@ -91,7 +113,7 @@ pub extern "C" fn intersect_ray(world_handle : Handle, from : &Vector, dir : &Ve
 
     let predicate = |handle: ColliderHandle, _collider: &Collider| -> bool {
         if handle_excluded_callback.is_some() {
-            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle));
+            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle), &handle_excluded_info);
         }
         return true;
     };
@@ -128,7 +150,7 @@ pub extern "C" fn intersect_ray(world_handle : Handle, from : &Vector, dir : &Ve
 }
 
 #[no_mangle]
-pub extern "C" fn intersect_point(world_handle : Handle, position : &Vector,  collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback) -> usize {
+pub extern "C" fn intersect_point(world_handle : Handle, position : &Vector,  collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback, handle_excluded_info: &QueryExcludedInfo) -> usize {
     let mut physics_engine = SINGLETON.lock().unwrap();
 	let physics_world = physics_engine.get_world(world_handle);
 
@@ -144,7 +166,7 @@ pub extern "C" fn intersect_point(world_handle : Handle, position : &Vector,  co
 
     let predicate = |handle: ColliderHandle, _collider: &Collider| -> bool {
         if handle_excluded_callback.is_some() {
-            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle));
+            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle), &handle_excluded_info);
         }
         return true;
     };
@@ -174,7 +196,7 @@ pub extern "C" fn intersect_point(world_handle : Handle, position : &Vector,  co
 }
 
 #[no_mangle]
-pub extern "C" fn shape_casting(world_handle : Handle, motion : &Vector, position: &Vector, rotation: Real, shape_handle : Handle, collide_with_body: bool, collide_with_area: bool, handle_excluded_callback: QueryHandleExcludedCallback) -> ShapeCastResult {
+pub extern "C" fn shape_casting(world_handle : Handle, motion : &Vector, position: &Vector, rotation: Real, shape_handle : Handle, collide_with_body: bool, collide_with_area: bool, handle_excluded_callback: QueryHandleExcludedCallback, handle_excluded_info: &QueryExcludedInfo) -> ShapeCastResult {
     let mut physics_engine = SINGLETON.lock().unwrap();
 
     let shared_shape = physics_engine.get_shape(shape_handle).clone();
@@ -195,7 +217,7 @@ pub extern "C" fn shape_casting(world_handle : Handle, motion : &Vector, positio
 
     let predicate = |handle: ColliderHandle, _collider: &Collider| -> bool {
         if handle_excluded_callback.is_some() {
-            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle));
+            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle), &handle_excluded_info);
         }
         return true;
     };
@@ -221,7 +243,7 @@ pub extern "C" fn shape_casting(world_handle : Handle, motion : &Vector, positio
 }
 
 #[no_mangle]
-pub extern "C" fn intersect_shape(world_handle : Handle, position: &Vector, rotation: Real, shape_handle : Handle, collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback) -> usize {
+pub extern "C" fn intersect_shape(world_handle : Handle, position: &Vector, rotation: Real, shape_handle : Handle, collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback, handle_excluded_info: &QueryExcludedInfo) -> usize {
     let mut physics_engine = SINGLETON.lock().unwrap();
 
     let shared_shape = physics_engine.get_shape(shape_handle).clone();
@@ -241,7 +263,7 @@ pub extern "C" fn intersect_shape(world_handle : Handle, position: &Vector, rota
 
     let predicate = |handle: ColliderHandle, _collider: &Collider| -> bool {
         if handle_excluded_callback.is_some() {
-            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle));
+            return !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(handle), &physics_world.get_collider_user_data(handle), &handle_excluded_info);
         }
         return true;
     };
@@ -273,7 +295,7 @@ pub extern "C" fn intersect_shape(world_handle : Handle, position: &Vector, rota
 }
 
 #[no_mangle]
-pub extern "C" fn intersect_aabb(world_handle : Handle, aabb_min : &Vector, aabb_max : &Vector, collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback) -> usize {
+pub extern "C" fn intersect_aabb(world_handle : Handle, aabb_min : &Vector, aabb_max : &Vector, collide_with_body: bool, collide_with_area: bool, hit_info_array : *mut PointHitInfo, hit_info_length : usize, handle_excluded_callback: QueryHandleExcludedCallback, handle_excluded_info: &QueryExcludedInfo) -> usize {
     let mut physics_engine = SINGLETON.lock().unwrap();
 
 	let physics_world = physics_engine.get_world(world_handle);
@@ -313,7 +335,7 @@ pub extern "C" fn intersect_aabb(world_handle : Handle, aabb_min : &Vector, aabb
             }
 
             if valid_hit && handle_excluded_callback.is_some(){
-                valid_hit = !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(*handle), &physics_world.get_collider_user_data(*handle));
+                valid_hit = !handle_excluded_callback.unwrap()(world_handle, collider_handle_to_handle(*handle), &physics_world.get_collider_user_data(*handle), &handle_excluded_info);
             }
         }
         

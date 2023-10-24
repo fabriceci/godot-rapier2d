@@ -2,8 +2,7 @@
 #include "../spaces/rapier_space_2d.h"
 
 RapierGrooveJoint2D::RapierGrooveJoint2D(const Vector2 &p_a_groove1, const Vector2 &p_a_groove2, const Vector2 &p_b_anchor, RapierBody2D *p_body_a, RapierBody2D *p_body_b) :
-    RapierJoint2D(p_body_a, p_body_b){
-
+		RapierJoint2D(p_body_a, p_body_b) {
 	Vector2 point_A_1 = A->get_inv_transform().xform(p_a_groove1);
 	Vector2 point_A_2 = A->get_inv_transform().xform(p_a_groove2);
 

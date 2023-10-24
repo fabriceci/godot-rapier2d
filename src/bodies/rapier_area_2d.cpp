@@ -1,7 +1,7 @@
 #include "rapier_area_2d.h"
-#include "rapier_body_2d.h"
 #include "../servers/rapier_physics_server_2d.h"
 #include "../spaces/rapier_space_2d.h"
+#include "rapier_body_2d.h"
 
 void RapierArea2D::set_space(RapierSpace2D *p_space) {
 	if (p_space == get_space()) {
