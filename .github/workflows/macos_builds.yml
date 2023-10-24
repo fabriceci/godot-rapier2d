@@ -49,5 +49,6 @@ jobs:
 
       - name: Upload ${{ matrix.target }} ${{ matrix.arch }}
         uses: ./.github/actions/upload
-        precision: ${{ matrix.precision }}
-        features: ${{ matrix.features }}
+        with:
+          precision: ${{ matrix.precision }}
+          features: ${{ matrix.features }}
