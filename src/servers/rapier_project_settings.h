@@ -8,14 +8,14 @@ public:
 
 	static bool should_run_on_separate_thread();
 	static int get_max_threads();
-	static float get_solver_min_ccd_dt();
-	static float get_solver_erp();
-	static float get_solver_damping_ratio();
-	static float get_solver_joint_erp();
-	static float get_solver_joint_damping_ratio();
-	static float get_solver_allowed_linear_error();
-	static float get_solver_max_penetration_correction();
-	static float get_solver_prediction_distance();
+	static double get_solver_min_ccd_dt();
+	static double get_solver_erp();
+	static double get_solver_damping_ratio();
+	static double get_solver_joint_erp();
+	static double get_solver_joint_damping_ratio();
+	static double get_solver_allowed_linear_error();
+	static double get_solver_max_penetration_correction();
+	static double get_solver_prediction_distance();
 	static int get_solver_max_velocity_iterations();
 	static int get_solver_max_velocity_friction_iterations();
 	static int get_solver_max_stabilization_iterations();

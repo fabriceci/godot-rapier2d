@@ -89,7 +89,7 @@ bool RapierDirectSpaceState2D::_intersect_ray(const Vector2 &from, const Vector2
 	return false;
 }
 
-bool RapierDirectSpaceState2D::_cast_motion(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, real_t *p_closest_safe, real_t *p_closest_unsafe) {
+bool RapierDirectSpaceState2D::_cast_motion(const RID &shape_rid, const Transform2D &transform, const Vector2 &motion, double margin, uint32_t collision_mask, bool collide_with_bodies, bool collide_with_areas, float *p_closest_safe, float *p_closest_unsafe) {
 	RapierShape2D *shape = space->get_shape_from_rid(shape_rid);
 	ERR_FAIL_COND_V(!shape, false);
 	rapier2d::Handle shape_handle = shape->get_rapier_shape();

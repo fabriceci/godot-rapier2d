@@ -76,30 +76,3 @@ pub struct SimulationSettings {
 
     pub gravity : Vector,
 }
-
-#[no_mangle]
-pub extern "C" fn default_simulation_settings() -> SimulationSettings {
-    SimulationSettings {
-        dt: 1.0 / 60.0,
-        min_ccd_dt: 1.0 / 60.0 / 100.0,
-        erp: 0.8,
-        damping_ratio: 0.25,
-        joint_erp: 1.0,
-        joint_damping_ratio: 1.0,
-        allowed_linear_error: 0.001,
-        max_penetration_correction: Real::MAX,
-        prediction_distance: 0.002,
-        max_velocity_iterations: 4,
-        max_velocity_friction_iterations: 8,
-        max_stabilization_iterations: 1,
-        interleave_restitution_and_friction_resolution: true, // Enabling this makes a big difference for 2D stability.
-        // TODO: what is the optimal value for min_island_size?
-        // It should not be too big so that we don't end up with
-        // huge islands that don't fit in cache.
-        // However we don't want it to be too small and end up with
-        // tons of islands, reducing SIMD parallelism opportunities.
-        min_island_size: 128,
-        max_ccd_substeps: 1,
-        gravity : Vector { x : 0.0, y : -9.81 },
-    }
-}
