@@ -545,6 +545,11 @@ void RapierBody2D::set_space(RapierSpace2D *p_space) {
 				if (torque != 0.0) {
 					apply_torque_impulse(torque);
 				}
+				rapier2d::Handle space_handle = get_space()->get_handle();
+				rapier2d::Material mat;
+				mat.friction = friction;
+				mat.restitution = bounce;
+				rapier2d::body_update_material(space_handle, body_handle, &mat);
 			}
 		}
 	}
