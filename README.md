@@ -23,26 +23,7 @@
 
 A 2d [rapier](https://github.com/dimforge/rapier) physics server for [Godot Engine](https://github.com/godotengine/godot), implemented as a GDExtension.
 
-# Limitations
-
-- One way direction missing(WIP)
-- Spring Joint missing(WIP)
-- Static Body Constant Speed or Conveyer Belt missing (WIP)
-- Shape scaling doesn't work (WIP)
-- Changing properties before they are added in world doesn't work (WIP)
-
-# Build Features
-
-## Float Precision
-
-This plugin is built for both single and double precision builds.
-
-## Rapier Features
-
-This package supports the following features of rapier ([more on this here](https://rapier.rs/docs/user_guides/rust/getting_started)):
-
-- simd-stable: enables explicit SIMD optimizations using the wide crate. Has limited cross-platform support but can be used with a stable version of the Rust compiler.
-- enhanced-determinism: enables cross-platform determinism (assuming the rest of your code is also deterministic) across all 32-bit and 64-bit platforms that implements the IEEE 754-2008 standard strictly. This includes most modern processors as well as WASM targets.
+**I'm currently running out of time to continue active development, @Ughuu has offered to continue the development on a fork https://github.com/appsinacup/godot-rapier-2d, so I'm going to archive this repo.**
 
 # Installation
 
@@ -53,15 +34,6 @@ This package supports the following features of rapier ([more on this here](http
 - Build it yourself. Read more about it in the [documentation](DOCUMENTATION.MD).
 
 After installing, go to `Advanced Settings` -> `Physics` -> `2D`. Change `Physics Engine` to `Rapier2D`.
-
-# Roadmap
-
-- Cross Platform Determinism
-- Fix all other issues from Limitations.
-
-# [Discord](https://discord.gg/56dMud8HYn)
-
-A vibrant community for discussion, user support and showcases.
 
 # License
 
